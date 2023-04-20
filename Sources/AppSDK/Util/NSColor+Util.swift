@@ -9,16 +9,16 @@ import Foundation
 import AppKit
 
 public struct CodeableColor: Codable {
-    var red: CGFloat
-    var green: CGFloat
-    var blue: CGFloat
-    var alpha: CGFloat
+    public var red: CGFloat
+    public var green: CGFloat
+    public var blue: CGFloat
+    public var alpha: CGFloat
     
-    var nsColor: NSColor {
+    public var nsColor: NSColor {
         NSColor(red: self.red, green: self.green, blue: self.blue, alpha: self.alpha)
     }
     
-    init(from color: NSColor) {
+    public init(from color: NSColor) {
         var comps = [CGFloat](repeating: 0.0, count: color.numberOfComponents)
         color.getComponents(&comps)
     
