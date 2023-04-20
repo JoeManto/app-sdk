@@ -25,7 +25,7 @@ private struct ReadFrameModifier: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     func readFrame(_ frame: Binding<CGRect>) -> some View {
         return self.modifier(ReadFrameModifier(frame: frame))
     }

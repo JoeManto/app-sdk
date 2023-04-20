@@ -8,13 +8,13 @@
 import Foundation
 import SwiftUI
 
-struct DropDownView: View {
+public struct DropDownView: View {
     
-    let title: String
-    let items: [String]
-    let onSelection: (Int, String) -> ()
+    public let title: String
+    public let items: [String]
+    public let onSelection: (Int, String) -> ()
     
-    var body: some View {
+    public var body: some View {
         Menu {
             ForEach((0..<items.count), id: \.self) { i in
                 Button(items[i], action: {

@@ -8,19 +8,19 @@
 import Foundation
 import SwiftUI
 
-struct CheckBox: View {
-    var isOn: Binding<Bool>
+public struct CheckBox: View {
+    public var isOn: Binding<Bool>
         
     private let onChange: ((Bool) -> Void)?
     private let allowUnchecking: Bool
     
-    init(isOn: Binding<Bool>, allowUnchecking: Bool = true, onChange: ((Bool) -> Void)? = nil) {
+    public init(isOn: Binding<Bool>, allowUnchecking: Bool = true, onChange: ((Bool) -> Void)? = nil) {
         self.isOn = isOn
         self.onChange = onChange
         self.allowUnchecking = allowUnchecking
     }
     
-    var body: some View {
+    public var body: some View {
         VStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 1.5)

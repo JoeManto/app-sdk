@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-extension View {
+public extension View {
     @ViewBuilder
     private func onBackgroundTapContent(enabled: Bool, viewFrame: CGRect, windowSize: CGSize, _ action: @escaping () -> Void) -> some View {
         if enabled {
@@ -31,10 +31,10 @@ extension View {
     }
 }
 
-struct EditableLabel: View {
-    @Binding var text: String
+public struct EditableLabel: View {
+    @Binding public var text: String
         
-    @State var editing = false {
+    @State public var editing = false {
         didSet {
             if text.isEmpty {
                 text = "Empty"
@@ -46,20 +46,19 @@ struct EditableLabel: View {
         }
     }
     
-    @State var frame: CGRect = .zero
+    @State public var frame: CGRect = .zero
     
-    let onEditEnd: () -> Void
+    public let onEditEnd: () -> Void
     
-    let containingWindowSize: CGSize
+    public let containingWindowSize: CGSize
     
-    init(_ txt: Binding<String>, containingWindow: NSWindow, onEditEnd: @escaping () -> Void) {
+    public init(_ txt: Binding<String>, containingWindow: NSWindow, onEditEnd: @escaping () -> Void) {
         _text = txt
         self.onEditEnd = onEditEnd
         self.containingWindowSize = containingWindow.contentView?.bounds.size ?? .zero
     }
     
-    var body: some View {
-        
+    public var body: some View {
         ZStack {
             textFieldView()
                 .fixedSize()

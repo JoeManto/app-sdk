@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-extension Font {
+public extension Font {
     static func standardFont(size: CGFloat, relativeTo: TextStyle) -> Font {
         Font.custom("Avenir Next", size: size, relativeTo: relativeTo)
     }

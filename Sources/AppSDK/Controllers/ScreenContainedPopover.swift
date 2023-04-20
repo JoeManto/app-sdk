@@ -8,14 +8,14 @@
 import Foundation
 import AppKit
 
-class ScreenContainedPopover: NSPopover {
+public class ScreenContainedPopover: NSPopover {
     
     private var showingObserver: NSKeyValueObservation?
     private var windowFrameObserver: NSKeyValueObservation?
     
-    var startingOrigin: NSPoint?
+    public var startingOrigin: NSPoint?
     
-    override init() {
+    public override init() {
         super.init()
         
         self.showingObserver = self.observe(\.isShown, changeHandler: { [unowned self] (_,_) in
@@ -27,7 +27,7 @@ class ScreenContainedPopover: NSPopover {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func resetPopoverOrigin() {
+    public func resetPopoverOrigin() {
         if let origin = startingOrigin {
             self.window?.setFrameOrigin(origin)
         }
@@ -38,7 +38,7 @@ class ScreenContainedPopover: NSPopover {
         }
     }
     
-    func handleShowingChange() {
+    public func handleShowingChange() {
         if self.isShown {
             //self.window?.moveOnScreenIfNeeded()
             self.window?.moveTopRight()
@@ -48,7 +48,7 @@ class ScreenContainedPopover: NSPopover {
         }
     }
     
-    func showNear(statusItem: NSStatusItem) {
+    public func showNear(statusItem: NSStatusItem) {
         let invisibleWindow = NSWindow(contentRect: NSMakeRect(0, 0, 20, 5), styleMask: .borderless, backing: .buffered, defer: false)
         invisibleWindow.backgroundColor = .red
         invisibleWindow.alphaValue = 0
@@ -73,7 +73,7 @@ class ScreenContainedPopover: NSPopover {
     }
 }
 
-extension NSPopover {
+public extension NSPopover {
     var window: NSWindow? {
         self.contentViewController?.view.window
     }

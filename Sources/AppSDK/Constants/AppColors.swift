@@ -8,11 +8,11 @@
 import Foundation
 import SwiftUI
 
-struct DynamicColor {
-    let normal: NSColor
-    let highlight: NSColor
+public struct DynamicColor {
+    public let normal: NSColor
+    public let highlight: NSColor
     
-    func highlighting(_ isHighlighted: Bool) -> Color {
+    public func highlighting(_ isHighlighted: Bool) -> Color {
         if isHighlighted {
             return Color(highlight)
         }
@@ -20,7 +20,7 @@ struct DynamicColor {
     }
 }
 
-struct AppColors {
-    static let destructive = DynamicColor(normal: NSColor.hex("FF3B30", alpha: 1.0), highlight: NSColor.hex("FC5E56", alpha: 1.0))
-    static let gray1 = DynamicColor(normal:  NSColor.hex("C7C7CC", alpha: 1.0), highlight: NSColor.hex("DEDEDE", alpha: 1.0))
+public struct AppColors {
+    public static let destructive = DynamicColor(normal: NSColor.hex("FF3B30", alpha: 1.0), highlight: NSColor.hex("FC5E56", alpha: 1.0))
+    public static let gray1 = DynamicColor(normal:  NSColor.hex("C7C7CC", alpha: 1.0), highlight: NSColor.hex("DEDEDE", alpha: 1.0))
 }

@@ -55,7 +55,7 @@ fileprivate struct HoldModifier: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     func onHold(onTap: (() -> ())? = nil, onRelease: ((Double) -> ())? = nil, maxHoldTime: Int? = nil) -> some View {
         return self.modifier(HoldModifier(onTap: onTap, onRelease: onRelease, maxHoldTime: maxHoldTime))
     }

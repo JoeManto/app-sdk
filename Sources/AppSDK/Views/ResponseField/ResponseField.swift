@@ -8,10 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct ResponseField: View {
-    let vm: ResponseFieldViewModel
+public struct ResponseField: View {
+    public let vm: ResponseFieldViewModel
     
-    @State var selection: String
+    @State public var selection: String
     @State private var actionInProgress: Bool = false
     
     @State private var btnSize = CGSize(width: 0, height: 0)
@@ -21,12 +21,12 @@ struct ResponseField: View {
     @State private var waveIndicatorScale = 1.0
     @State private var waveIndicatorOpacity = 0.0
     
-    init(vm: ResponseFieldViewModel) {
+    public init(vm: ResponseFieldViewModel) {
         self.vm = vm
         self.selection = vm.selection?.options.first ?? "selection"
     }
     
-    var body: some View {
+    public var body: some View {
         VStack {
             HStack {
                 Text(vm.content.title)

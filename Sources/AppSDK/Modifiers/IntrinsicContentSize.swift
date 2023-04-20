@@ -16,7 +16,7 @@ struct IntrinsicContentSizePreferenceKey: PreferenceKey {
     }
 }
 
-extension View {
+public extension View {
     func readIntrinsicContentSize(to size: Binding<CGSize>) -> some View {
         self.background(GeometryReader { proxy in
             Color.clear.preference(

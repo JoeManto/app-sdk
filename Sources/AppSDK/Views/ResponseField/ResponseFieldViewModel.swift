@@ -7,45 +7,45 @@
 
 import Foundation
 
-struct ResponseFieldSelection {
-    let options: [String]
-    let onSelection: (Int, String) -> ()
+public struct ResponseFieldSelection {
+    public let options: [String]
+    public let onSelection: (Int, String) -> ()
 }
 
-struct ResponseFieldContent {
-    enum FieldType {
+public struct ResponseFieldContent {
+    public enum FieldType {
         case selection, action
     }
     
-    let title: String
-    let subtitle: String
-    let type: FieldType
+    public let title: String
+    public let subtitle: String
+    public let type: FieldType
 }
 
-struct ResponseFieldAction {
-    let name: String
-    var destructive: Bool = false
-    let onAction: () -> ()
+public struct ResponseFieldAction {
+    public let name: String
+    public var destructive: Bool = false
+    public let onAction: () -> ()
 }
 
-class ResponseFieldViewModel {
+public class ResponseFieldViewModel {
 
-    var selection: ResponseFieldSelection?
-    var action: ResponseFieldAction?
-    let content: ResponseFieldContent
-    let fieldType: ResponseFieldContent.FieldType
+    public var selection: ResponseFieldSelection?
+    public var action: ResponseFieldAction?
+    public let content: ResponseFieldContent
+    public let fieldType: ResponseFieldContent.FieldType
     
-    required init(content: ResponseFieldContent) {
+    public required init(content: ResponseFieldContent) {
         self.content = content
         self.fieldType = self.content.type
     }
     
-    convenience init(content: ResponseFieldContent, action: ResponseFieldAction) {
+    public convenience init(content: ResponseFieldContent, action: ResponseFieldAction) {
         self.init(content: content)
         self.action = action
     }
     
-    convenience init(content: ResponseFieldContent, selection: ResponseFieldSelection) {
+    public convenience init(content: ResponseFieldContent, selection: ResponseFieldSelection) {
         self.init(content: content)
         self.selection = selection
     }

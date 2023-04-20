@@ -8,7 +8,7 @@
 import Foundation
 import AppKit
 
-extension NSWindow {
+public extension NSWindow {
     func moveTopRight() {
         // Attempt to the position the window 5 times over a 250 millisecond period
         for update in 0..<5 {

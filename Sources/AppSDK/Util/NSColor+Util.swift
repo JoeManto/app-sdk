@@ -8,7 +8,7 @@
 import Foundation
 import AppKit
 
-struct CodeableColor: Codable {
+public struct CodeableColor: Codable {
     var red: CGFloat
     var green: CGFloat
     var blue: CGFloat
@@ -29,7 +29,7 @@ struct CodeableColor: Codable {
     }
 }
 
-extension NSColor {
+public extension NSColor {
     
     var toHexString: String {
         var r: CGFloat = 0
