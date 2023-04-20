@@ -1,3 +1,3 @@
 # AppSDK
 
-A description of this package.
+General SwiftUI components, services, and extensions used throughout my apps
