@@ -38,7 +38,7 @@ public struct ResponseFieldAction {
     public var destructive: Bool = false
     public let onAction: () -> ()
     
-    public init(name: String, destructive: Bool, onAction: @escaping () -> Void) {
+    public init(name: String, destructive: Bool = false, onAction: @escaping () -> Void) {
         self.name = name
         self.destructive = destructive
         self.onAction = onAction
