@@ -60,13 +60,13 @@ public struct ResponseField: View {
         }
     }
     
-    func deletionAnimation() {
+    func deletionAnimation(duration: Int) {
         var transaction = Transaction(animation: .linear)
         transaction.disablesAnimations = true
 
         withTransaction(transaction) {
             self.offsetX = self.btnSize.width
-            withAnimation(.linear(duration: 3.0)) {
+            withAnimation(.linear(duration: Double(duration))) {
                 self.offsetX = 0
             }
         }
@@ -125,7 +125,7 @@ public struct ResponseField: View {
                     if action.destructive, self.deleting == false {
                         self.deleting = true
                         
-                        deletionAnimation()
+                        deletionAnimation(duration: action.dur)
                     }
                 },
                 onRelease: { time in
@@ -137,12 +137,12 @@ public struct ResponseField: View {
                     self.deleting = false
                     self.offsetX = self.btnSize.width
                     
-                    if time >= 3.0 {
+                    if time >= Double(action.dur) {
                         action.onAction()
                         deletionCompleteAnimation()
                     }
                 },
-                maxHoldTime: 3
+                maxHoldTime: action.dur
             )
             .onAppear {
                 self.offsetX = self.btnSize.width

@@ -36,11 +36,13 @@ public struct ResponseFieldContent {
 public struct ResponseFieldAction {
     public let name: String
     public var destructive: Bool = false
+    public var dur: Int
     public let onAction: () -> ()
     
-    public init(name: String, destructive: Bool = false, onAction: @escaping () -> Void) {
+    public init(name: String, destructive: Bool = false, dur: Int = 3, onAction: @escaping () -> Void) {
         self.name = name
         self.destructive = destructive
+        self.dur = dur
         self.onAction = onAction
     }
 }
