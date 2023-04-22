@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Purchases View Controller-->
+        <scene sceneID="BcH-tb-k1e">
+            <objects>
+                <viewController storyboardIdentifier="PurchasesViewController" id="DFh-D6-fvT" customClass="PurchasesViewController" customModule="SuperWindow" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Dus-io-yco">
+                        <rect key="frame" x="0.0" y="0.0" width="800" height="585"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Bog-Pm-xnF">
+                                <rect key="frame" x="36" y="512" width="121" height="31"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Purchases" usesSingleLineMode="YES" id="7X6-ng-rps">
+                                    <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cZJ-9D-2hh">
+                                <rect key="frame" x="36" y="488" width="244" height="16"/>
+                                <textFieldCell key="cell" alignment="left" title="Place to manage and restore purchases" id="hfa-jO-dvr">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1dy-gc-DyO">
+                                <rect key="frame" x="36" y="406" width="418" height="16"/>
+                                <textFieldCell key="cell" alignment="left" title="Applies any SuperWindow In-app purchases linked to your Apple-ID." id="oqb-gn-whw">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zvT-nQ-HJB">
+                                <rect key="frame" x="38" y="429" width="58" height="19"/>
+                                <buttonCell key="cell" type="roundRect" title="Restore" bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IXs-Kf-58Y">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="cellTitle"/>
+                                </buttonCell>
+                            </button>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="0d4-W4-mVb">
+                                <rect key="frame" x="38" y="376" width="384" height="5"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="cZJ-9D-2hh" firstAttribute="leading" secondItem="Dus-io-yco" secondAttribute="leading" constant="38" id="2ZT-ut-3Gg"/>
+                            <constraint firstItem="zvT-nQ-HJB" firstAttribute="leading" secondItem="Dus-io-yco" secondAttribute="leading" constant="38" id="GuH-pI-zP8"/>
+                            <constraint firstItem="Bog-Pm-xnF" firstAttribute="leading" secondItem="Dus-io-yco" secondAttribute="leading" constant="38" id="JVw-yL-1f2"/>
+                            <constraint firstItem="zvT-nQ-HJB" firstAttribute="top" secondItem="cZJ-9D-2hh" secondAttribute="bottom" constant="40" id="Lzn-4f-rB6"/>
+                            <constraint firstItem="Bog-Pm-xnF" firstAttribute="top" secondItem="Dus-io-yco" secondAttribute="top" constant="42" id="MWh-Md-Dsa"/>
+                            <constraint firstAttribute="trailing" secondItem="0d4-W4-mVb" secondAttribute="trailing" constant="378" id="Z16-C9-5WL"/>
+                            <constraint firstItem="0d4-W4-mVb" firstAttribute="top" secondItem="1dy-gc-DyO" secondAttribute="bottom" constant="27" id="b7Y-UN-cBu"/>
+                            <constraint firstItem="1dy-gc-DyO" firstAttribute="top" secondItem="zvT-nQ-HJB" secondAttribute="bottom" constant="8" symbolic="YES" id="fXN-qT-81R"/>
+                            <constraint firstItem="cZJ-9D-2hh" firstAttribute="top" secondItem="Bog-Pm-xnF" secondAttribute="bottom" constant="8" symbolic="YES" id="hJu-6l-fjM"/>
+                            <constraint firstItem="1dy-gc-DyO" firstAttribute="leading" secondItem="Dus-io-yco" secondAttribute="leading" constant="38" id="jxy-Lg-Vnc"/>
+                            <constraint firstItem="0d4-W4-mVb" firstAttribute="leading" secondItem="Dus-io-yco" secondAttribute="leading" constant="38" id="o7k-ed-JNL"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="TitleLabel" destination="Bog-Pm-xnF" id="6DG-ea-lno"/>
+                        <outlet property="restoreBtn" destination="zvT-nQ-HJB" id="2Cf-Ej-7nK"/>
+                        <outlet property="restoreSubTitle" destination="1dy-gc-DyO" id="zYy-E0-OTj"/>
+                        <outlet property="seperator" destination="Dus-io-yco" id="tjo-4J-hcS"/>
+                        <outlet property="subTitleLabel" destination="cZJ-9D-2hh" id="szT-Hl-fdG"/>
+                        <outlet property="titleLabel" destination="Bog-Pm-xnF" id="JS6-l0-k5d"/>
+                    </connections>
+                </viewController>
+                <customObject id="k2G-RV-BAX" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="570" y="791.5"/>
+        </scene>
+    </scenes>
+</document>
