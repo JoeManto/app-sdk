@@ -68,6 +68,7 @@ public class ScreenContainedPopover: NSPopover {
             self.startingOrigin = invisibleWindow.frame.origin
             self.show(relativeTo: invisibleWindow.contentView!.frame, of: invisibleWindow.contentView!, preferredEdge: NSRectEdge.minY)
             
+            self.contentViewController?.view.window?.makeKey()
             NSApp.activate(ignoringOtherApps: true)
         }
     }
