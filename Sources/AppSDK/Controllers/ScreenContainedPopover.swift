@@ -33,15 +33,13 @@ public class ScreenContainedPopover: NSPopover {
         }
         
         if self.isShown {
-            //self.window?.moveOnScreenIfNeeded()
-            self.window?.moveTopRight()
+            self.window?.moveTopRightRepeatedly()
         }
     }
     
     public func handleShowingChange() {
         if self.isShown {
-            //self.window?.moveOnScreenIfNeeded()
-            self.window?.moveTopRight()
+            self.window?.moveTopRightRepeatedly()
         }
         else {
             resetPopoverOrigin()
