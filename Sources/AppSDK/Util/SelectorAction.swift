@@ -7,17 +7,16 @@
 
 import Foundation
 
-class SelectorAction: NSObject {
+public class SelectorAction: NSObject {
 
     private let _action: () -> ()
 
-    init(action: @escaping () -> ()) {
+    public init(action: @escaping () -> ()) {
         _action = action
         super.init()
     }
 
-    @objc func action() {
+    @objc public func action() {
         _action()
     }
-
 }

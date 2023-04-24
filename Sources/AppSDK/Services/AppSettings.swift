@@ -8,20 +8,20 @@
 import Foundation
 
 public struct AppSetting {
-    let key: AppSettingKey
-    let title: String
-    let description: String
-    let defaultValue: Bool
+    public let key: AppSettingKey
+    public let title: String
+    public let description: String
+    public let defaultValue: Bool
     
-    var enabled: Bool {
+    public var enabled: Bool {
         AppSettings.shared?.defaults.bool(forKey: key.rawValue) ?? false
     }
     
-    func toggle() {
+    public func toggle() {
         AppSettings.shared?.toggle(key)
     }
     
-    func reset() {
+    public func reset() {
         AppSettings.shared?.defaults.set(defaultValue, forKey: key.rawValue)
     }
 }
@@ -34,8 +34,6 @@ public protocol AppSettingsProvider {
     func appSettings() -> [AppSettingKey: AppSetting]
 }
 
-
-
 public class AppSettings {
         
     public static var shared: AppSettings?
@@ -46,17 +44,17 @@ public class AppSettings {
         self.provider = provider
     }
     
-    static var suiteName: String?
+    public static var suiteName: String?
     
     lazy var defaults: UserDefaults = {
         UserDefaults(suiteName: Self.suiteName) ?? UserDefaults.standard
     }()
     
-    var all: [AppSettingKey: AppSetting] {
+    public var all: [AppSettingKey: AppSetting] {
         self.provider.appSettings()
     }
     
-    func toggle(_ key: AppSettingKey) {
+    public func toggle(_ key: AppSettingKey) {
         guard let setting = provider.appSettings()[key] else {
             return
         }
@@ -64,11 +62,11 @@ public class AppSettings {
         self.defaults.set(!setting.enabled, forKey: setting.key.rawValue)
     }
     
-    func get(_ key: AppSettingKey) -> AppSetting! {
+    public func get(_ key: AppSettingKey) -> AppSetting! {
         provider.appSettings()[key]
     }
     
-    func resetSettings() {
+    public func resetSettings() {
         for (_, setting) in provider.appSettings() {
             setting.reset()
         }
