@@ -9,9 +9,8 @@ import Foundation
 import AppKit
 import SwiftUI
 
-class TrialViewController: NSHostingController<TrialWallView> {
-    
-    override init?(coder: NSCoder, rootView: TrialWallView) {
+public class TrialViewController: NSHostingController<TrialWallView> {
+    public override init?(coder: NSCoder, rootView: TrialWallView) {
         super.init(coder: coder, rootView: rootView)
     }
     
@@ -20,7 +19,7 @@ class TrialViewController: NSHostingController<TrialWallView> {
     }
 }
 
-extension TrialViewController {
+public extension TrialViewController {
     
     func pushToWindow() -> NSWindow {
         let window = NSWindow(contentRect: NSRect(), styleMask: .closable, backing: .buffered, defer: false)

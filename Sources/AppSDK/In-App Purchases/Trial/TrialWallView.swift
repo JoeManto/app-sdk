@@ -22,15 +22,21 @@ public class TrialWallActionHandler {
     }
 }
 
-struct TrialWallView: View {
+public struct TrialWallView: View {
     
-    @ObservedObject var vm: TrialWallViewModel
+    @ObservedObject public var vm: TrialWallViewModel
         
-    var headerView: (AnyView)? = nil
+    public var headerView: (AnyView)? = nil
     
-    let actionHandler: TrialWallActionHandler
+    public let actionHandler: TrialWallActionHandler
+    
+    public init(vm: TrialWallViewModel, headerView: AnyView? = nil, actionHandler: TrialWallActionHandler) {
+        self.vm = vm
+        self.headerView = headerView
+        self.actionHandler = actionHandler
+    }
 
-    var body: some View {
+    public var body: some View {
         VStack {
             if let headerView = headerView {
                 headerView
