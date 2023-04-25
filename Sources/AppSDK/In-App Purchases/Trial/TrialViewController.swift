@@ -10,8 +10,9 @@ import AppKit
 import SwiftUI
 
 public class TrialViewController: NSHostingController<TrialWallView> {
-    public override init?(coder: NSCoder, rootView: TrialWallView) {
-        super.init(coder: coder, rootView: rootView)
+    
+    public override init(rootView: TrialWallView) {
+        super.init(rootView: rootView)
     }
     
     @MainActor required dynamic init?(coder: NSCoder) {
