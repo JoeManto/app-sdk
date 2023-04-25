@@ -18,12 +18,25 @@ public struct PaymentOption: Identifiable {
     public let price: Double
     public let recommended: Bool
     public let trialLength: Int
+    
+    public init(type: PaymentType, price: Double, recommended: Bool, trialLength: Int) {
+        self.type = type
+        self.price = price
+        self.recommended = recommended
+        self.trialLength = trialLength
+    }
 }
 
 public struct TrialProduct {
     public let name: String
     public let options: [PaymentOption]
     public var image: NSImage? = nil
+    
+    public init(name: String, options: [PaymentOption], image: NSImage? = nil) {
+        self.name = name
+        self.options = options
+        self.image = image
+    }
 }
 
 public class TrialWallViewModel: ObservableObject {
