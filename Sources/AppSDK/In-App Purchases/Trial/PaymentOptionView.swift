@@ -48,6 +48,8 @@ struct PaymentOptionView: View {
     
     var selected: Bool = false
     
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    
     var body: some View {
         VStack {
             VStack {
@@ -55,7 +57,6 @@ struct PaymentOptionView: View {
                     Text(vm.title)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .font(.standardFontBold(size: 18, relativeTo: .body))
-                        .colorInvert()
                     
                     if vm.option.recommended {
                         Spacer()
@@ -84,7 +85,7 @@ struct PaymentOptionView: View {
             }
             .frame(width: 300)
             .padding()
-            .background(Environment(\.colorScheme).wrappedValue == ColorScheme.dark ? Color.black : Color.white)
+            .background(colorScheme == ColorScheme.dark ? Color.black : Color.white)
             .cornerRadius(12)
             .overlay(content: {
                 RoundedRectangle(cornerRadius: 12)

@@ -30,6 +30,8 @@ public struct TrialWallView: View {
     
     public let actionHandler: TrialWallActionHandler
     
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    
     public init(vm: TrialWallViewModel, headerView: AnyView? = nil, actionHandler: TrialWallActionHandler) {
         self.vm = vm
         self.headerView = headerView
@@ -38,62 +40,64 @@ public struct TrialWallView: View {
 
     public var body: some View {
         ScrollView {
-            if let headerView = headerView {
-                headerView
-            }
-            else {
-                self.defaultHeader()
-            }
-            
-            ForEach(vm.productModel.options, id: \.type) { option in
-                PaymentOptionView(vm: PaymentOptionViewModel(option: option, onPaymentSelect: {
-                    vm.paymentSelected(option: option)
-                }), selected: vm.selectedOption?.id == option.id)
-            }
-            
-            restoreAndTerms()
-        
             VStack {
-                Text("Free Trial Timeline")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.standardFontBold(size: 18, relativeTo: .title))
-                    .padding(.bottom, 10)
+                if let headerView = headerView {
+                    headerView
+                }
+                else {
+                    self.defaultHeader()
+                }
                 
-                timelineDay(
-                    imgName: "circle.circle.fill",
-                    title: "Today",
-                    subtitle: "Start using One Palette for free", idx: 0
-                )
-                .padding(.bottom, 8)
+                ForEach(vm.productModel.options, id: \.type) { option in
+                    PaymentOptionView(vm: PaymentOptionViewModel(option: option, onPaymentSelect: {
+                        vm.paymentSelected(option: option)
+                    }), selected: vm.selectedOption?.id == option.id)
+                }
                 
-                timelineDay(
-                    imgName: "bell.circle",
-                    title: vm.trialTimelineNotification,
-                    subtitle: "You recive a notification about\n your free trial ending soon", idx: 1
-                )
-                .padding(.bottom, 8)
-           
-                timelineDay(
-                    imgName: "circle",
-                    title: vm.trialTimelineEnd,
-                    subtitle: """
+                restoreAndTerms()
+                
+                VStack {
+                    Text("Free Trial Timeline")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.standardFontBold(size: 18, relativeTo: .title))
+                        .padding(.bottom, 10)
+                    
+                    timelineDay(
+                        imgName: "circle.circle.fill",
+                        title: "Today",
+                        subtitle: "Start using One Palette for free", idx: 0
+                    )
+                    .padding(.bottom, 8)
+                    
+                    timelineDay(
+                        imgName: "bell.circle",
+                        title: vm.trialTimelineNotification,
+                        subtitle: "You recive a notification about\n your free trial ending soon", idx: 1
+                    )
+                    .padding(.bottom, 8)
+                    
+                    timelineDay(
+                        imgName: "circle",
+                        title: vm.trialTimelineEnd,
+                        subtitle: """
                 Your tiral ends and automatically
                 resubsribes if your subscription is active
                 
                 Subscriptions can be cancelled anytime
                 by managing your subscriptions
                 """, idx: 2
-                )
+                    )
+                }
+                .frame(width: 325)
+                .padding(.top, 25)
+                
+                continueBtn()
+                    .padding(.top, 50)
             }
-            .frame(width: 325)
-            .padding(.top, 25)
-            
-            continueBtn()
-                .padding(.top, 50)
+            .padding([.leading, .trailing], 50)
+            .padding([.top, .bottom])
         }
-        .padding([.leading, .trailing], 50)
-        .padding([.top, .bottom])
-        .background(Environment(\.colorScheme).wrappedValue == ColorScheme.dark ? Color.white : Color.black)
+        .background(colorScheme == ColorScheme.dark ? Color.black : Color.white)
         .frame(width: 400, height: 700)
     }
     
