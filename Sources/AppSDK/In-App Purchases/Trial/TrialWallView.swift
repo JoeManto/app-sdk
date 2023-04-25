@@ -94,7 +94,7 @@ public struct TrialWallView: View {
         .padding([.leading, .trailing], 50)
         .padding([.top, .bottom])
         .background(Environment(\.colorScheme).wrappedValue == ColorScheme.dark ? Color.white : Color.black)
-        .frame(width: 500)
+        .frame(width: 400)
     }
     
     @ViewBuilder func timelineDay(imgName: String, title: String, subtitle: String, idx: Int) -> some View {
