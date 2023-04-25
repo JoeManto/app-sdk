@@ -46,7 +46,7 @@ struct PaymentOptionView: View {
     
     let vm: PaymentOptionViewModel
     
-    @State var selected: Bool = false
+    var selected: Bool = false
     
     var body: some View {
         VStack {
