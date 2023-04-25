@@ -22,10 +22,16 @@ public class TrialViewController: NSHostingController<TrialWallView> {
 
 public extension TrialViewController {
     
-    func pushToWindow() -> NSWindow {
-        let window = NSWindow(contentRect: NSRect(), styleMask: .closable, backing: .buffered, defer: false)
+    func pushToWindow(title: String, display: Bool) -> NSWindow {
+        let window = NSWindow(contentRect: NSRect(), styleMask: [.closable, .miniaturizable, .titled], backing: .buffered, defer: false)
         window.contentViewController = self
-        window.makeKeyAndOrderFront(self)
+        window.isReleasedWhenClosed = true
+        window.title = ""
+        window.backgroundColor = NSColor.clear
+        
+        if display {
+            window.makeKeyAndOrderFront(self)
+        }
         
         return window
     }
