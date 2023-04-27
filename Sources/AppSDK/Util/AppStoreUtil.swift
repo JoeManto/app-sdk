@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct AppStoreUtil {
+public struct AppStoreUtil {
     
-    static func getAppStoreVersion(appBundleId: String) async -> String? {
+    public static func getAppStoreVersion(appBundleId: String) async -> String? {
         let request = URLRequest(url: URL(string: "https://itunes.apple.com/lookup?bundleId=\(appBundleId)")!)
         
         let networkResponse: (data: Data, response: URLResponse)
