@@ -9,17 +9,17 @@ import Foundation
 import Cocoa
 import SwiftUI
 
-enum LogType {
+public enum LogType {
     case info, err, warn
 }
 
-class Logging {
+public class Logging {
     
-    static let logFileUrlKey = "AppSDK-LOGFile"
+    public static let logFileUrlKey = "AppSDK-LOGFile"
     
-    static let shared = Logging()
+    public static let shared = Logging()
     
-    func saveLogs() {
+    public func saveLogs() {
         guard let url = UserDefaults.standard.url(forKey: Self.logFileUrlKey) else {
             Logging.shared.log(msg: "Couldn't get logs url", comp: "[Logging]", type: .err)
             return
@@ -42,7 +42,7 @@ class Logging {
         }
     }
     
-    func resetLogs() {
+    public func resetLogs() {
         self.removeLogFile()
         try? self.createNewLogFile()?.close()
     }
@@ -78,12 +78,12 @@ class Logging {
         }
     }
     
-    func log(marker: String) {
+    public func log(marker: String) {
         let msg = "-------------------\(marker)-------------------"
         self.log(msg: msg)
     }
     
-    func log(msg: String, comp: String = "[Unk]", type: LogType = .info) {
+    public func log(msg: String, comp: String = "[Unk]", type: LogType = .info) {
         guard let fileHandler = openLogFileForWriting() else {
             return
         }
