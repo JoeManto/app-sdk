@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+@available(macOS 13.0, *)
 public extension View {
     @ViewBuilder
     private func onBackgroundTapContent(enabled: Bool, viewFrame: CGRect, windowSize: CGSize, _ action: @escaping () -> Void) -> some View {
@@ -31,6 +32,7 @@ public extension View {
     }
 }
 
+@available(macOS 13.0, *)
 public struct EditableLabel: View {
     @Binding public var text: String
         
