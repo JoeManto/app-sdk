@@ -53,13 +53,13 @@ public struct ConfirmationView: View {
             Text(vm.confirmation.title)
                 .font(.standardFontMedium(size: 18, relativeTo: .title))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding([.leading, .top])
+                .padding([.leading, .trailing, .top])
             
             if !vm.confirmation.subtitle.isEmpty {
                 Text(vm.confirmation.subtitle)
                     .font(.standardFont(size: 12, relativeTo: .subheadline))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding([.leading])
+                    .padding([.leading, .trailing])
             }
             
             HStack {
@@ -75,9 +75,7 @@ public struct ConfirmationView: View {
 
 public class ConfirmationViewController: NSHostingController<ConfirmationView> {
     public func pushToWindow() {
-        let window = NSWindow(contentRect: NSRect.zero, styleMask: [.closable, .titled], backing: .buffered, defer: false)
-        window.contentViewController = self
-        window.makeKeyAndOrderFront(self)
+        WindowManager.shared.create(root: self, shouldShow: true, style: [.closable, .titled])
     }
 }
 
