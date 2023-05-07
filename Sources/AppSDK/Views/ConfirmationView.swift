@@ -74,6 +74,33 @@ public struct ConfirmationView: View {
 }
 
 public class ConfirmationViewController: NSHostingController<ConfirmationView> {
+        
+    public init(confirm: Confirmation, onContinue: (() -> Void)? = nil, onCancel: (() -> Void)? = nil) {
+        let vm = ConfirmationViewModel(confirmation: confirm)
+        let view = ConfirmationView(vm: vm)
+        super.init(rootView: view)
+        
+        vm.onContinue = {
+            self.remove()
+            onContinue?()
+        }
+        
+        vm.onCancel = {
+            self.remove()
+            onCancel?()
+        }
+    }
+    
+    @MainActor required dynamic init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public func remove() {
+        if let window = self.view.window {
+            WindowManager.shared.remove(window: window)
+        }
+    }
+    
     public func pushToWindow() {
         WindowManager.shared.create(root: self, shouldShow: true, style: [.closable, .titled])
     }
