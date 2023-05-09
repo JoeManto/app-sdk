@@ -102,7 +102,8 @@ public class ConfirmationViewController: NSHostingController<ConfirmationView> {
     }
     
     public func pushToWindow() {
-        WindowManager.shared.create(root: self, shouldShow: true, style: [.closable, .titled])
+        let window = WindowManager.shared.create(root: self, shouldShow: true, style: [.closable, .titled])
+        window.level = .floating
     }
 }
 
