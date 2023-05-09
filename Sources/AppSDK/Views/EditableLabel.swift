@@ -51,12 +51,15 @@ public struct EditableLabel: View {
     @State public var frame: CGRect = .zero
     
     public let onEditEnd: () -> Void
+    public let onChange: ((String) -> Void)?
     
     public let containingWindowSize: CGSize
     
-    public init(_ txt: Binding<String>, containingWindow: NSWindow, onEditEnd: @escaping () -> Void) {
+    public init(_ txt: Binding<String>, containingWindow: NSWindow, onEditEnd: @escaping () -> Void, onChange: ((String) -> Void)? = nil) {
         _text = txt
         self.onEditEnd = onEditEnd
+        self.onChange = onChange
+        
         self.containingWindowSize = containingWindow.contentView?.bounds.size ?? .zero
     }
     
@@ -68,6 +71,9 @@ public struct EditableLabel: View {
                 .onBackgroundTap(enabled: editing, windowSize: containingWindowSize, viewFrame: frame) {
                     editing = false
                 }
+                .onChange(of: text, perform: { newValue in
+                    self.onChange?(newValue)
+                })
             
             labelView()
                 .opacity(self.editing ? 0 : 1)
