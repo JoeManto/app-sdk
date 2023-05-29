@@ -23,13 +23,18 @@ public struct ResponseField: View {
     
     public init(vm: ResponseFieldViewModel) {
         self.vm = vm
-        self.selection = vm.selection?.options.first ?? "selection"
+        
+        if let selectionContent = vm.content as? ResponseFieldSelection {
+            self.selection = selectionContent.options.first ?? ""
+        } else {
+            self.selection = ""
+        }
     }
     
     public var body: some View {
         VStack {
             HStack {
-                Text(vm.content.title)
+                Text(vm.content.name)
                     .font(Font.standardFontMedium(size: 14, relativeTo: .body))
                 Spacer()
             
@@ -51,11 +56,11 @@ public struct ResponseField: View {
 
     private func inputView() -> some View {
         VStack {
-            if vm.fieldType == .selection {
-                self.selectionView()
+            if let selectionContent = vm.content as? ResponseFieldSelection {
+                self.selectionView(selectionContent: selectionContent)
             }
-            else if vm.fieldType == .action, let action = vm.action {
-                self.actionView(action: action)
+            else if let actionContent = vm.content as? ResponseFieldAction {
+                self.actionView(action: actionContent)
             }
         }
     }
@@ -92,7 +97,7 @@ public struct ResponseField: View {
                     .cornerRadius(8)
                     .offset(x: offsetX)
                 
-                Text(action.name)
+                Text(action.btnTitle)
                     .foregroundColor({
                         if action.destructive {
                             return deleting ? .white : AppColors.destructive.highlighting(actionInProgress)
@@ -130,7 +135,7 @@ public struct ResponseField: View {
                 },
                 onRelease: { time in
                     guard action.destructive else {
-                        action.onAction()
+                        action.onAction?()
                         return
                     }
                     
@@ -138,7 +143,7 @@ public struct ResponseField: View {
                     self.offsetX = self.btnSize.width
                     
                     if time >= Double(action.dur) {
-                        action.onAction()
+                        action.onAction?()
                         deletionCompleteAnimation()
                     }
                 },
@@ -156,11 +161,11 @@ public struct ResponseField: View {
         }
     }
     
-    private func selectionView() -> some View {
+    private func selectionView(selectionContent: ResponseFieldSelection) -> some View {
         VStack {
-            DropDownView(title: selection, items: vm.selection?.options ?? [], onSelection: { i, newSelection in
+            DropDownView(title: selection, items: selectionContent.options, onSelection: { i, newSelection in
                 selection = newSelection
-                vm.selection?.onSelection(i, newSelection)
+                selectionContent.onSelection?(i, newSelection)
             })
             .fixedSize()
             Spacer()
@@ -172,24 +177,13 @@ struct ResponseField_Previews: PreviewProvider {
     
     static var previews: some View {
         VStack {
-            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldContent(title: "Sort palette by brightness", subtitle: "Reorders the color groups of the current palette\nby the brightness of header color of each group ", type: .action), action: ResponseFieldAction(name: "Action", onAction: {
-                print("Action")
-            })))
             
-            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldContent(title: "Sort palette by brightness", subtitle: "Reorders the color groups of the current palette\nby the brightness of header color of each group ", type: .action), action: ResponseFieldAction(name: "Action", destructive: true, onAction: {
-                print("Action")
-            })))
+            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldAction(name: "Sort palette by brightness", btnTitle: "Sort", subtitle: "Reorders the color groups of the current palette\nby the brightness of header color of each group")))
             
-            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldContent(
-                title: "Sort palette by brightness",
-                subtitle: "Reorders the color groups of the current palette\nby the brightness of header color of each group ",
-                type: .selection
-            ), selection: ResponseFieldSelection(
-                options: ["Hello World", "Whats good"],
-                onSelection: { idx, selection in
-                    print("Selection \(idx) \(selection)")
-                }
-            )))
+            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldAction(name: "Delete palette", btnTitle: "delete", subtitle: "Reorders the color groups of the current palette\nby the brightness of header color of each group", destructive: true)))
+            
+            ResponseField(vm: ResponseFieldViewModel(content: ResponseFieldSelection(name: "Selection Title", subtitle: "Selection Subtitle", options: ["Option 1", "Option 2", "Option 3"])))
+    
         }
         .padding(50)
     }
