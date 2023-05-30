@@ -23,7 +23,13 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AppSDK",
-            dependencies: []),
+            dependencies: [],
+            resources: [
+                .copy("Resources/welcome.html"),
+                .copy("Resources/bug.html"),
+                .copy("Resources/feature.html")
+            ]
+        ),
         .testTarget(
             name: "AppSDKTests",
             dependencies: ["AppSDK"]),

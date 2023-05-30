@@ -11,7 +11,7 @@ import AppKit
 public extension NSWindow {
     
     enum WindowLocation {
-        case TopRight, TopLeft, BottomRight, BottomLeft
+        case TopRight, TopLeft, BottomRight, BottomLeft, center
     }
     
     func moveTopRightRepeatedly() {
@@ -46,6 +46,8 @@ public extension NSWindow {
         case .BottomRight:
             self.moveWindowBottomRight()
             break
+        case .center:
+            self.moveWindowCenter()
         }
     }
     
@@ -88,5 +90,18 @@ public extension NSWindow {
         
         let xPosition = screen.width - windowFrame.width
         self.setFrameOrigin(CGPoint(x: xPosition, y: 0))
+    }
+    
+    private func moveWindowCenter() {
+        guard let screen = self.screen ?? NSScreen.main else {
+            Logging.shared.log(msg: "\(#function) unable to get main screen", comp: "[WindowUtil]", type: .warn)
+            return
+        }
+        
+        let windowFrame = self.frame
+        
+        let xPosition = screen.frame.width - windowFrame.width
+        let yPosition = screen.frame.height - windowFrame.height
+        self.setFrameOrigin(CGPoint(x: xPosition / 2, y: yPosition / 2))
     }
 }
