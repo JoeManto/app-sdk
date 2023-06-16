@@ -12,13 +12,15 @@ private struct ReadFrameModifier: ViewModifier {
     
     @Binding var frame: CGRect
     
+    let space: CoordinateSpace
+    
     func body(content: Content) -> some View {
         content
             .background(
                 GeometryReader { proxy in
                     Color.clear
                         .onAppear {
-                            frame = proxy.frame(in: CoordinateSpace.global)
+                            frame = proxy.frame(in: space)
                         }
                 }
             )
@@ -26,7 +28,7 @@ private struct ReadFrameModifier: ViewModifier {
 }
 
 public extension View {
-    func readFrame(_ frame: Binding<CGRect>) -> some View {
-        return self.modifier(ReadFrameModifier(frame: frame))
+    func readFrame(_ frame: Binding<CGRect>, space: CoordinateSpace = .global) -> some View {
+        return self.modifier(ReadFrameModifier(frame: frame, space: space))
     }
 }
