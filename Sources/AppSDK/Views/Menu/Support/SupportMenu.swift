@@ -67,6 +67,7 @@ public class SupportMenu: NSMenu {
     func showWebViewController(html: String) {
         guard let url = Bundle.module.url(forResource: html, withExtension: "html") else {
             assert(false, "Can't find welcome html file")
+            return
         }
         
         let vc = WKWebViewController()
