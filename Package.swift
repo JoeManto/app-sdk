@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "AppSDK",
     platforms: [
-        .macOS(.v12)
+        .macOS("14.0")
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.

@@ -4,6 +4,7 @@
 //
 //  Created by Joe Manto on 4/20/23.
 //
+import AppKit
 import Cocoa
 
 public class EventMonitor {
