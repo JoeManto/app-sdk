@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+#if os(macOS)
 @available(macOS 13.0, *)
 public extension View {
     @ViewBuilder
@@ -109,3 +110,4 @@ public struct EditableLabel: View {
         .disabled(!editing)
     }
 }
+#endif

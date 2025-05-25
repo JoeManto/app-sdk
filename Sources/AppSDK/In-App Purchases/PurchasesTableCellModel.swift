@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 9/26/21.
 //
 
+#if os(macOS)
 import Foundation
 import StoreKit
 
@@ -52,3 +53,4 @@ struct PurchasesTableCellModel {
         return "\(localSymbol)\(priceString)"
     }
 }
+#endif

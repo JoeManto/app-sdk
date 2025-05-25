@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
+
 public struct ResponseField: View {
     public let vm: ResponseFieldViewModel
     
@@ -188,3 +190,4 @@ struct ResponseField_Previews: PreviewProvider {
         .padding(50)
     }
 }
+#endif

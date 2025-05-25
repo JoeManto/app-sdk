@@ -1,10 +1,11 @@
 //
-//  File.swift
-//  
+//  TrialViewController.swift
+//
 //
 //  Created by Joe Manto on 4/24/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 import SwiftUI
@@ -36,3 +37,4 @@ public extension TrialViewController {
         return window
     }
 }
+#endif

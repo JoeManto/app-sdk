@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 9/26/21.
 //
 
+#if os(macOS)
 import Foundation
 import StoreKit
 
@@ -159,10 +160,11 @@ extension IAPManager: SKProductsRequestDelegate, SKPaymentTransactionObserver {
         }
     }
     
-    /// Called when a transcation has finished. Logs all transactions that have been removed from the payment queue.
+    /// Called when a transaction has finished. Logs all transactions that have been removed from the payment queue.
     func paymentQueue(_ queue: SKPaymentQueue, removedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
             Logging.shared.log(msg: "Transaction \(transaction.payment.productIdentifier) finished", comp: "[IAPManager]")
         }
     }
 }
+#endif

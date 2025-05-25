@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 4/20/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -84,3 +85,4 @@ extension NSColor {
         })
     }
 }
+#endif

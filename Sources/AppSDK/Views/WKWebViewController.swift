@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 5/28/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 import WebKit
@@ -50,3 +51,4 @@ class WKWebViewController: NSViewController {
         self.webview.loadHTMLString(html, baseURL: url)
     }
 }
+#endif

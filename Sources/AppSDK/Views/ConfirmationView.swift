@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 5/5/23.
 //
 
+#if os(macOS)
 import Foundation
 import SwiftUI
 import AppKit
@@ -112,3 +113,4 @@ struct ConfirmationView_Previews: PreviewProvider {
         ConfirmationView(vm: ConfirmationViewModel(confirmation: Confirmation(title: "Title", subtitle: "Subtitle")))
     }
 }
+#endif

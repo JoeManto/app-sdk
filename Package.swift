@@ -3,10 +3,17 @@
 
 import PackageDescription
 
+#if os(iOS)
+let ignoredFiles = ["AppSDK/In-App Purchases/Purchases.storyboard"]
+#else
+let ignoredFiles = [String]()
+#endif
+
 let package = Package(
     name: "AppSDK",
     platforms: [
-        .macOS("14.0")
+        .macOS("14.0"),
+        .iOS(.v16)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -24,6 +31,7 @@ let package = Package(
         .target(
             name: "AppSDK",
             dependencies: [],
+            exclude: ignoredFiles,
             resources: [
                 .copy("Resources/welcome.html"),
                 .copy("Resources/bug.html"),

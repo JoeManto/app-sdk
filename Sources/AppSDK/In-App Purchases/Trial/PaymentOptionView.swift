@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  PaymentOptionViewModel.swift
+//
 //
 //  Created by Joe Manto on 4/24/23.
 //
@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
 public class PaymentOptionViewModel {
     public let option: PaymentOption
     public var onPaymentSelect: (() -> Void)?
@@ -125,3 +126,4 @@ struct PaymentOptionView_Previews: PreviewProvider {
         }
     }
 }
+#endif

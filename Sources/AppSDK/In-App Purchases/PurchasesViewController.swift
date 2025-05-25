@@ -8,6 +8,7 @@
 import Foundation
 import StoreKit
 
+#if os(macOS)
 class PurchasesViewController : NSViewController, NSTableViewDataSource, NSTableViewDelegate, PurchasesTableCellDelegate, IAPManagerDelegate {
 
     @IBOutlet weak var titleLabel: NSTextField!
@@ -146,3 +147,4 @@ class PurchasesViewController : NSViewController, NSTableViewDataSource, NSTable
         }
     }
 }
+#endif

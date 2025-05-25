@@ -24,7 +24,7 @@ fileprivate struct HoldModifier: ViewModifier {
         }
         
         self.pressing = false
-        self.onRelease?(tapTime.distance(to: Date.now))
+        self.onRelease?(tapTime.distance(to: Date()))
     }
     
     private func tap() {

@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 9/26/21.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -104,3 +105,4 @@ class PurchasesTableCell : NSTableCellView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+#endif

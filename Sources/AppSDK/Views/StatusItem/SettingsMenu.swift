@@ -1,10 +1,11 @@
 //
-//  File.swift
-//  
+//  SettingsMenu.swift
+//
 //
 //  Created by Joe Manto on 4/23/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -55,3 +56,4 @@ extension NSMenu {
         AppSettings.shared?.resetSettings()
     }
 }
+#endif

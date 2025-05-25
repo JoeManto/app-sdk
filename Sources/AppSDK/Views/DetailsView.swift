@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 public struct DetailsView<Content: View, Details: View, Label: View>: View {
     @ViewBuilder var content: Content
     @ViewBuilder var details: Details
@@ -91,3 +92,4 @@ public struct DetailsView<Content: View, Details: View, Label: View>: View {
         }
     }
 }
+#endif

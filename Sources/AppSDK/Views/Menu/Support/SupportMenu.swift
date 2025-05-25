@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 5/28/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 import WebKit
@@ -101,3 +102,4 @@ public class SupportMenu: NSMenu {
         Logging.shared.resetLogs()
     }
 }
+#endif

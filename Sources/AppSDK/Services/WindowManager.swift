@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 5/5/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -154,3 +155,4 @@ public class WindowManager {
         return id
     }
 }
+#endif

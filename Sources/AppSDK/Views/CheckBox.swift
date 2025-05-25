@@ -24,7 +24,7 @@ public struct CheckBox: View {
         VStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 1.5)
-                    .fill(Color(NSColor.controlAccentColor))
+                    .fill(Color.accentColor)
                     .padding(2.5)
                     .opacity(isOn.wrappedValue ? 1.0 : 0.0)
             }

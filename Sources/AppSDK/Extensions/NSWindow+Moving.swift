@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 4/20/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -105,3 +106,4 @@ public extension NSWindow {
         self.setFrameOrigin(CGPoint(x: xPosition / 2, y: yPosition / 2))
     }
 }
+#endif

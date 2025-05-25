@@ -5,8 +5,8 @@
 //  Created by Joe Manto on 4/24/23.
 //
 
+#if os(macOS)
 import AppKit
-import Foundation
 import Cocoa
 
 public enum PaymentType {
@@ -90,3 +90,4 @@ public class TrialWallViewModel: ObservableObject {
         }
     }
 }
+#endif

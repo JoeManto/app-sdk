@@ -5,6 +5,7 @@
 //  Created by Joe Manto on 4/22/23.
 //
 
+#if os(macOS)
 import Foundation
 import AppKit
 
@@ -19,4 +20,4 @@ struct AppSDKUtil {
         }
     }
 }
-
+#endif

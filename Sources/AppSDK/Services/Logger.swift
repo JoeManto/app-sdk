@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if os(macOS)
 import Cocoa
+#endif
 import SwiftUI
 
 public enum LogType {
@@ -18,7 +20,8 @@ public class Logging {
     public static let logFileUrlKey = "AppSDK-LOGFile"
     
     public static let shared = Logging()
-    
+
+#if os(macOS)
     public func saveLogs() {
         guard let url = UserDefaults.standard.url(forKey: Self.logFileUrlKey) else {
             Logging.shared.log(msg: "Couldn't get logs url", comp: "[Logging]", type: .err)
@@ -41,7 +44,8 @@ public class Logging {
             }
         }
     }
-    
+#endif
+
     public func resetLogs() {
         self.removeLogFile()
         try? self.createNewLogFile()?.close()

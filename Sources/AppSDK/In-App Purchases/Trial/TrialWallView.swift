@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  TrialWallActionHandler.swift
+//
 //
 //  Created by Joe Manto on 4/24/23.
 //
@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
 public class TrialWallActionHandler {
     public let onRestore: () -> Void
     public let onTerms: () -> Void
@@ -200,3 +201,4 @@ struct TrialWallView_Previews: PreviewProvider {
          .cornerRadius(20)
  }
  */
+#endif

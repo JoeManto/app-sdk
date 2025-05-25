@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
 public struct DynamicColor {
     public let normal: NSColor
     public let highlight: NSColor
@@ -24,3 +25,4 @@ public struct AppColors {
     public static let destructive = DynamicColor(normal: NSColor.hex("FF3B30", alpha: 1.0), highlight: NSColor.hex("FC5E56", alpha: 1.0))
     public static let gray1 = DynamicColor(normal:  NSColor.hex("C7C7CC", alpha: 1.0), highlight: NSColor.hex("DEDEDE", alpha: 1.0))
 }
+#endif
