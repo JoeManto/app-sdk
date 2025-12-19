@@ -12,7 +12,7 @@ let ignoredFiles = [String]()
 let package = Package(
     name: "AppSDK",
     platforms: [
-        .macOS("14.0"),
+        .macOS("12.3"),
         .iOS(.v16)
     ],
     products: [

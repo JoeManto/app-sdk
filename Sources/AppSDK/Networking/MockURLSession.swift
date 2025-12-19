@@ -16,7 +16,7 @@ extension URLSession: URLSessionProtocol {}
 /// `MockURLSession` is a mock implementation of the `URLSessionProtocol` protocol.
 /// It is primarily intended for use in unit tests or previews, where actual network calls should be avoided.
 /// 
-/// This structure allows you to specify a mapping of endpoint URLs (ignoring query items and scheme) to `Data` objects representing mock responses.
+/// This structure allows you to specify a mapping of endpoint URL substrings to `Data` objects representing mock responses.
 ///
 /// {
 ///   "domain.com/example": {
@@ -77,7 +77,10 @@ public struct MockURLSession: URLSessionProtocol {
             throw URLError(.badURL)
         }
 
-        guard let mockResponse = _endpointResponses.first(where: { makeMatchableURL($0.key.absoluteURL) == url })?.value else {
+        guard let mockResponse = _endpointResponses.first(where: {
+            request.url?.absoluteString.contains($0.key.absoluteString) ?? false
+            //makeMatchableURL($0.key.absoluteURL) == url
+        })?.value else {
             throw AppError.notFound(resource: "Mocked endpoint response", url.absoluteString)
         }
 

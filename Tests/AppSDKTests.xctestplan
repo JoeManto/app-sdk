@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "BFB6F346-CDAF-4CDF-AC83-85094B39FAAC",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "AppSDKTests",
+        "name" : "AppSDKTests"
+      }
+    }
+  ],
+  "version" : 1
+}
