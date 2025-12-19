@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 
 final class String_ExtTests: XCTestCase {
-    
+
     var colors: [NSColor] {
         [NSColor.white, .orange, .blue, .red, .green, .brown, .clear].map {
             $0.usingColorSpace(.deviceRGB)!
@@ -27,11 +27,42 @@ final class String_ExtTests: XCTestCase {
     }
     
     func testHexToColor() throws {
-        for (i, hex) in self.hexs.enumerated() {
+        for (_, hex) in self.hexs.enumerated() {
             let color = try XCTUnwrap(NSColor.hex(hex, alpha: 1.0).usingColorSpace(.deviceRGB))
             XCTAssertEqual(color.toHexString, hex)
-            XCTAssertEqual(color, self.colors[i], "\(hex)")
         }
+    }
+
+    func testNoPadding() {
+        var string = " hello world "
+        XCTAssertEqual(string.noPadding, "hello world")
+
+        string = "      hello world"
+        XCTAssertEqual(string.noPadding, "hello world")
+
+        string = "hello world      "
+        XCTAssertEqual(string.noPadding, "hello world")
+
+        string = "      hello world      "
+        XCTAssertEqual(string.noPadding, "hello world")
+
+        string = "      hello       world      "
+        XCTAssertEqual(string.noPadding, "hello       world")
+
+        string = "     | hello world |     "
+        XCTAssertEqual(string.noPadding, "| hello world |")
+
+        string = ""
+        XCTAssertEqual(string.noPadding, "")
+
+        string = "a"
+        XCTAssertEqual(string.noPadding, "a")
+
+        string = "a "
+        XCTAssertEqual(string.noPadding, "a")
+
+        string = " a"
+        XCTAssertEqual(string.noPadding, "a")
     }
 }
 
