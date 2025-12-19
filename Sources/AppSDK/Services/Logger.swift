@@ -21,6 +21,8 @@ public class Logging {
     
     public static let shared = Logging()
 
+    private var logFileHandle: FileHandle?
+
 #if os(macOS)
     public func saveLogs() {
         guard let url = UserDefaults.standard.url(forKey: Self.logFileUrlKey) else {
@@ -48,7 +50,7 @@ public class Logging {
 
     public func resetLogs() {
         self.removeLogFile()
-        try? self.createNewLogFile()?.close()
+        try? self.createNewLogFile().close()
     }
     
     private func removeLogFile() {
@@ -59,7 +61,7 @@ public class Logging {
         try? FileManager().removeItem(atPath: url.path)
     }
     
-    private func createNewLogFile() -> FileHandle? {
+    private func createNewLogFile() throws -> FileHandle {
         self.removeLogFile()
         let temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         let temporaryFilename = ProcessInfo().globallyUniqueString
@@ -69,16 +71,24 @@ public class Logging {
         
         UserDefaults.standard.set(temporaryFileURL, forKey: Self.logFileUrlKey)
        
-        return try? FileHandle(forUpdating: temporaryFileURL)
+        return try FileHandle(forUpdating: temporaryFileURL)
     }
-    
-    private func openLogFileForWriting() -> FileHandle? {
-        if let url = UserDefaults.standard.url(forKey: Self.logFileUrlKey),
-            let fileHandler = try? FileHandle(forUpdating: url) {
-            return fileHandler
+
+    private func getLogFileHandle() throws -> FileHandle {
+        if let logFileHandle {
+            return logFileHandle
         }
-        else {
-            return createNewLogFile()
+
+        let newHandle = try openNewLogFileForWriting()
+        self.logFileHandle = newHandle
+        return newHandle
+    }
+
+    private func openNewLogFileForWriting() throws -> FileHandle {
+        return if let url = UserDefaults.standard.url(forKey: Self.logFileUrlKey) {
+            try FileHandle(forUpdating: url)
+        } else {
+            try createNewLogFile()
         }
     }
     
@@ -86,17 +96,17 @@ public class Logging {
         let msg = "-------------------\(marker)-------------------"
         self.log(msg: msg)
     }
-    
-    public func log(msg: String, comp: String = "[Unk]", type: LogType = .info) {
-        guard let fileHandler = openLogFileForWriting() else {
+
+    public func log(msg: String, comp: String = "[-]", type: LogType = .info) {
+        guard let fileHandler = try? getLogFileHandle() else {
             return
         }
+
         guard (try? fileHandler.seekToEnd()) != nil else {
             try? fileHandler.close()
             return
         }
-        
-        
+
         var component = comp
         if comp.count < 15 {
             component.append(String.init(repeating: " ", count: 15 - comp.count))
@@ -123,4 +133,8 @@ public class Logging {
         
         try? fileHandler.close()
     }
+}
+
+public func log(_ type: LogType, _ msg: String, comp: String = "[-]") {
+    Logging.shared.log(msg: msg, comp: comp, type: type)
 }
