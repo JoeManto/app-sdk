@@ -9,18 +9,18 @@ import AppSDK
 import Darwin
 import Foundation
 
-struct CLIProperties {
-    static var shared = CLIProperties()
+public struct CLIProperties {
+    public static var shared = CLIProperties()
 
-    var displayWidth: Int {
+    public var displayWidth: Int {
         return Int(displaySize.width)
     }
 
-    var displayHeight: Int {
+    public var displayHeight: Int {
         return Int(displaySize.height)
     }
 
-    var displaySize: NSSize {
+    public var displaySize: NSSize {
         var windowSize = winsize()
         // STDOUT_FILENO is the file descriptor for standard output
         if ioctl(STDOUT_FILENO, TIOCGWINSZ, &windowSize) == 0 {

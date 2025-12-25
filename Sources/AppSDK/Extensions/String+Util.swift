@@ -22,4 +22,12 @@ public extension String {
             return self
         }
     }
+
+    func truncateString(limit: Int = 30) -> String {
+        if self.count > limit {
+            return String(self.prefix(limit + 1)) + "…"
+        } else {
+            return self
+        }
+    }
 }
