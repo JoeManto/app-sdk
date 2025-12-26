@@ -9,6 +9,7 @@ import Foundation
 
 extension Date {
 
+
     /// Represents the days of the week, with raw values matching the `Calendar.Component.weekday`.
     ///
     /// Use this enum to safely refer to days of the week when working with calendar-based date calculations.
