@@ -102,9 +102,13 @@ public class Logging {
             return
         }
 
-        guard (try? fileHandler.seekToEnd()) != nil else {
-            try? fileHandler.close()
-            return
+        do {
+            guard (try fileHandler.seekToEnd()) != nil else {
+                try fileHandler.close()
+                return
+            }
+        } catch {
+            print("Failed to close file handle \(error)")
         }
 
         var component = comp
@@ -130,8 +134,6 @@ public class Logging {
         print(logMessage)
         
         fileHandler.write(logMessage.data(using: .utf8) ?? Data())
-        
-        try? fileHandler.close()
     }
 }
 
