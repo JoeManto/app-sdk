@@ -22,7 +22,76 @@ public struct CLILineGraph {
     private var _minXWidth: Double
     private var _minYHeight: Double
 
-    public init(entries: [(x: Double, y: Double)], title: String? = nil, xAxisTitle: String? = nil, yAxisTitle: String? = nil, width: Int = 50, height: Int = 10) {
+    /// Filters entries by removing a percentage of "middle" entries while preserving peaks and valleys.
+    ///
+    /// - Parameters:
+    ///   - entries: The original data points sorted by x value.
+    ///   - resolution: A value from 0.0 to 1.0 where 1.0 keeps all entries and 0.0 keeps only peaks/valleys.
+    /// - Returns: Filtered entries with peaks and valleys preserved.
+    private static func filterByResolution(entries: [(x: Double, y: Double)], resolution: Double) -> [(x: Double, y: Double)] {
+        guard entries.count > 2, resolution < 1.0 else {
+            return entries
+        }
+
+        let resolution = max(0, min(1, resolution))
+
+        // Identify peaks and valleys (local maxima and minima)
+        var isPeakOrValley = [Bool](repeating: false, count: entries.count)
+
+        // First and last are always kept
+        isPeakOrValley[0] = true
+        isPeakOrValley[entries.count - 1] = true
+
+        for i in 1..<(entries.count - 1) {
+            let prev = entries[i - 1].y
+            let curr = entries[i].y
+            let next = entries[i + 1].y
+
+            // Local maximum (peak)
+            if curr >= prev && curr >= next && (curr > prev || curr > next) {
+                isPeakOrValley[i] = true
+            }
+            // Local minimum (valley)
+            else if curr <= prev && curr <= next && (curr < prev || curr < next) {
+                isPeakOrValley[i] = true
+            }
+        }
+
+        // Collect middle entries (non-peak, non-valley)
+        var middleIndices: [Int] = []
+        for i in 0..<entries.count {
+            if !isPeakOrValley[i] {
+                middleIndices.append(i)
+            }
+        }
+
+        // Calculate how many middle entries to keep
+        let middleToKeep = Int(Double(middleIndices.count) * resolution)
+
+        // Select evenly distributed middle entries to keep
+        var middleToKeepSet = Set<Int>()
+        if middleToKeep > 0 && !middleIndices.isEmpty {
+            let step = Double(middleIndices.count) / Double(middleToKeep)
+            for i in 0..<middleToKeep {
+                let index = Int(Double(i) * step)
+                if index < middleIndices.count {
+                    middleToKeepSet.insert(middleIndices[index])
+                }
+            }
+        }
+
+        // Build the final filtered array
+        var result: [(x: Double, y: Double)] = []
+        for i in 0..<entries.count {
+            if isPeakOrValley[i] || middleToKeepSet.contains(i) {
+                result.append(entries[i])
+            }
+        }
+
+        return result
+    }
+
+    public init(entries: [(x: Double, y: Double)], title: String? = nil, xAxisTitle: String? = nil, yAxisTitle: String? = nil, width: Int = 50, height: Int = 10, resolution: Double = 1.0) {
         self.content = ""
         self.title = title
         self.xAxisTitle = xAxisTitle
@@ -31,7 +100,9 @@ public struct CLILineGraph {
         self._maxYAxisHeight = Double(height)
         self._minXWidth = Double(width)
         self._minYHeight = Double(height)
-        var entries = entries
+
+        // Apply resolution filtering to reduce middle entries
+        var entries = Self.filterByResolution(entries: entries, resolution: resolution)
 
         // Find min max x and y.
         var maxY = entries.first?.y ?? 0
