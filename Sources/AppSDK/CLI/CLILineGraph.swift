@@ -155,9 +155,29 @@ public struct CLILineGraph {
                     }
 
                     // Draw the x axis value, but if we going to overlap a previous datapoint skip this value.
-                    if showsXAxisValues, content[xValueLabelYIndex][x] == " " {
-                        for (i, valueChar) in Array(String(format: "%0.f", value.x)).enumerated() {
-                            content[xValueLabelYIndex][x + i] = valueChar
+                    if showsXAxisValues {
+                        let valueString = String(format: "%0.f", value.x)
+
+                        // Enough space to write out full value?
+                        if x + valueString.count < content[xValueLabelYIndex].count,
+                           // Left side is boundary or empty?
+                           (content[xValueLabelYIndex][x - 1] == " " || content[xValueLabelYIndex][x - 1] == "│"),
+                           // Right side is empty?
+                           content[xValueLabelYIndex][x + valueString.count] == " " {
+
+                            // Attempt to draw, if checking for overlap.
+                            var contentCopy = content
+                            var didOverlap = false
+                            for (i, valueChar) in Array(String(format: "%0.f", value.x)).enumerated() {
+                                if contentCopy[xValueLabelYIndex][x + i] != " " {
+                                    didOverlap = true
+                                }
+                                contentCopy[xValueLabelYIndex][x + i] = valueChar
+                            }
+
+                            if !didOverlap {
+                                content = contentCopy
+                            }
                         }
                     }
 
