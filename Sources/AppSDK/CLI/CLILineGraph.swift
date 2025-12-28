@@ -180,6 +180,66 @@ public struct CLILineGraph {
         // The x index where we start to draw the y value members. Just before the boundary.
         let yValueLabelXIndex = yBoundaryLineXIndex - largestYAxisValueLength
 
+        // Pre-compute screen positions for all entries to enable line drawing
+        var screenPositions: [(screenX: Int, screenY: Int, entry: (x: Double, y: Double))] = []
+        for entry in entries {
+            // Convert data coordinates to screen coordinates
+            let screenX = xAxisStartIndex + Int((entry.x - minX) / scaleX)
+            // Y is inverted: higher values = lower row index (closer to top)
+            let screenY = yAxisStartIndex - Int((entry.y - minY) / scaleY)
+            screenPositions.append((screenX: screenX, screenY: screenY, entry: entry))
+        }
+
+        // Sort by x position to ensure we connect points left to right
+        screenPositions.sort { $0.screenX < $1.screenX }
+
+        // Draw connecting lines between consecutive points
+        for i in 0..<(screenPositions.count - 1) {
+            let from = screenPositions[i]
+            let to = screenPositions[i + 1]
+
+            let dx = to.screenX - from.screenX
+            let dy = to.screenY - from.screenY // Note: negative dy means going up visually
+
+            if dx <= 1 {
+                // Vertical line
+                let minScreenY = min(from.screenY, to.screenY)
+                let maxScreenY = max(from.screenY, to.screenY)
+                for y in (minScreenY + 1)..<maxScreenY {
+                    if y >= 0 && y <= yAxisStartIndex && from.screenX < content[y].count {
+                        content[y][from.screenX] = "|"
+                    }
+                }
+            } else if dy == 0 {
+                // Horizontal line
+                for x in (from.screenX + 1)..<to.screenX {
+                    if from.screenY >= 0 && from.screenY <= yAxisStartIndex && x < content[from.screenY].count {
+                        content[from.screenY][x] = "─"
+                    }
+                }
+            } else {
+                // Diagonal line - use Bresenham-style stepping
+                let steps = max(abs(dx), abs(dy))
+                for step in 1..<steps {
+                    let t = Double(step) / Double(steps)
+                    let x = from.screenX + Int(Double(dx) * t)
+                    let y = from.screenY + Int(Double(dy) * t)
+
+                    if y >= 0 && y <= yAxisStartIndex && x >= xAxisStartIndex && x < content[y].count {
+                        if content[y][x] == " " {
+                            if dy < 0 {
+                                // Going up (y decreasing = visually up)
+                                content[y][x] = "/"
+                            } else {
+                                // Going down (y increasing = visually down)
+                                content[y][x] = "╲"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         for y in content.indices.reversed() {
             // Keep y 0 empty to leave space for the title.
             if y == 0, title != nil {
@@ -274,5 +334,9 @@ public struct CLILineGraph {
         self.content = content.map {
             String($0)
         }.joined(separator: "\n")
+    }
+
+    private func drawConnectingLines() {
+        
     }
 }
