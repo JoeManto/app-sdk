@@ -8,335 +8,428 @@
 import Foundation
 
 public struct CLILineGraph {
+
+    // MARK: - Types
+
+    public typealias Entry = (x: Double, y: Double)
+
+    /// Holds pre-calculated layout indices for drawing the graph.
+    private struct Layout {
+        /// Column index where the graph data area begins.
+        let graphStartX: Int
+        /// Row index where the graph data area ends (bottom of plot area).
+        let graphEndY: Int
+        /// Row index for the x-axis boundary line.
+        let xAxisLineY: Int
+        /// Row index for x-axis value labels.
+        let xAxisLabelY: Int
+        /// Column index for the y-axis boundary line.
+        let yAxisLineX: Int
+        /// Column index where y-axis value labels start.
+        let yAxisLabelStartX: Int
+        /// Maximum character width for y-axis labels.
+        let yAxisLabelWidth: Int
+    }
+
+    // MARK: - Properties
+
     public private(set) var content: String
 
     public let title: String?
     public let xAxisTitle: String?
     public let yAxisTitle: String?
-    let showsXAxisValues = true
-    let showsYAxisValues = true
-    let showsAxisLines = true
 
-    private var _maxXAxisWidth: Double
-    private var _maxYAxisHeight: Double
-    private var _minXWidth: Double
-    private var _minYHeight: Double
+    private let showsXAxisValues = true
+    private let showsYAxisValues = true
+    private let showsAxisLines = true
 
-    /// Filters entries by removing a percentage of "middle" entries while preserving peaks and valleys.
-    ///
-    /// - Parameters:
-    ///   - entries: The original data points sorted by x value.
-    ///   - resolution: A value from 0.0 to 1.0 where 1.0 keeps all entries and 0.0 keeps only peaks/valleys.
-    /// - Returns: Filtered entries with peaks and valleys preserved.
-    private static func filterByResolution(entries: [(x: Double, y: Double)], resolution: Double) -> [(x: Double, y: Double)] {
+    private var maxWidth: Double
+    private var maxHeight: Double
+    private let minWidth: Double
+    private let minHeight: Double
+
+    // MARK: - Initialization
+
+    public init(
+        entries: [Entry],
+        title: String? = nil,
+        xAxisTitle: String? = nil,
+        yAxisTitle: String? = nil,
+        width: Int = 50,
+        height: Int = 10,
+        resolution: Double = 1.0
+    ) {
+        self.content = ""
+        self.title = title
+        self.xAxisTitle = xAxisTitle
+        self.yAxisTitle = yAxisTitle
+        self.maxWidth = Double(width)
+        self.maxHeight = Double(height)
+        self.minWidth = Double(width)
+        self.minHeight = Double(height)
+
+        // Filter entries based on resolution.
+        var entries = _filterEntriesByResolution(entries, resolution: resolution)
+
+        // Calculate data bounds and scaling.
+        let bounds = _calculateBounds(entries: entries)
+        let scale = _calculateScale(bounds: bounds)
+
+        // Calculate layout dimensions.
+        let yAxisLabelWidth = entries.reduce(0) { max($0, _formatValue($1.y).count) }
+        let extraHeight = (title != nil ? 1 : 0) + (showsAxisLines ? 1 : 0) + (showsXAxisValues ? 1 : 0) + (xAxisTitle != nil ? 1 : 0)
+        let extraWidth = (yAxisTitle != nil ? 1 : 0) + (showsYAxisValues ? yAxisLabelWidth : 0) + (showsAxisLines ? 1 : 0)
+
+        // Initialize content grid.
+        let gridWidth = Int(maxWidth + Double(extraWidth))
+        let gridHeight = Int(maxHeight + Double(extraHeight))
+        var grid: [[Character]] = Array(
+            repeating: Array(repeating: " ", count: gridWidth),
+            count: gridHeight
+        )
+
+        // Build layout.
+        let layout = Layout(
+            graphStartX: extraWidth,
+            graphEndY: (grid.count - 1) - (extraHeight - (title != nil ? 1 : 0)),
+            xAxisLineY: (grid.count - 1) - (extraHeight - (title != nil ? 1 : 0)) + 1,
+            xAxisLabelY: (grid.count - 1) - (extraHeight - (title != nil ? 1 : 0)) + 2,
+            yAxisLineX: extraWidth - 1,
+            yAxisLabelStartX: extraWidth - 1 - yAxisLabelWidth,
+            yAxisLabelWidth: yAxisLabelWidth
+        )
+
+        // Draw graph components.
+        _drawAxes(grid: &grid, layout: layout)
+        _drawDataPoints(grid: &grid, layout: layout, entries: &entries, bounds: bounds, scale: scale)
+        _drawConnectingLines(grid: &grid, layout: layout)
+
+        if let title {
+            _drawTitle(title, grid: &grid)
+        }
+
+        // Convert grid to string.
+        self.content = grid.map { String($0) }.joined(separator: "\n")
+    }
+
+    // MARK: - Bounds & Scale Calculation
+
+    private struct Bounds {
+        let minX: Double
+        let maxX: Double
+        let minY: Double
+        let maxY: Double
+
+        var rangeX: Double { maxX - minX }
+        var rangeY: Double { maxY - minY }
+    }
+
+    private struct Scale {
+        let x: Double
+        let y: Double
+    }
+
+    private func _calculateBounds(entries: [Entry]) -> Bounds {
+        guard let first = entries.first else {
+            return Bounds(minX: 0, maxX: 0, minY: 0, maxY: 0)
+        }
+
+        var minX = first.x, maxX = first.x
+        var minY = first.y, maxY = first.y
+
+        for entry in entries {
+            minX = min(minX, entry.x)
+            maxX = max(maxX, entry.x)
+            minY = min(minY, entry.y)
+            maxY = max(maxY, entry.y)
+        }
+
+        return Bounds(minX: minX, maxX: maxX, minY: minY, maxY: maxY)
+    }
+
+    private mutating func _calculateScale(bounds: Bounds) -> Scale {
+        var scaleY: Double = 1
+        if bounds.rangeY > maxHeight {
+            scaleY = bounds.rangeY / maxHeight
+        } else if bounds.rangeY < minHeight {
+            scaleY = bounds.rangeY / minHeight
+        } else {
+            maxHeight = bounds.rangeY
+        }
+
+        var scaleX: Double = 1
+        if bounds.rangeX > maxWidth {
+            scaleX = bounds.rangeX / maxWidth
+        } else if bounds.rangeX < minWidth {
+            scaleX = bounds.rangeX / minWidth
+        } else {
+            maxWidth = bounds.rangeX
+        }
+
+        return Scale(x: scaleX, y: scaleY)
+    }
+
+    // MARK: - Drawing: Axes
+
+    private func _drawAxes(grid: inout [[Character]], layout: Layout) {
+        for y in grid.indices {
+            for x in grid[y].indices {
+                // Y-axis vertical line.
+                if x == layout.yAxisLineX && y <= layout.graphEndY && showsAxisLines {
+                    grid[y][x] = "│"
+                }
+                // X-axis horizontal line.
+                if y == layout.xAxisLineY && x >= layout.graphStartX && showsAxisLines {
+                    grid[y][x] = "―"
+                }
+            }
+        }
+    }
+
+    // MARK: - Drawing: Data Points
+
+    private func _drawDataPoints(
+        grid: inout [[Character]],
+        layout: Layout,
+        entries: inout [Entry],
+        bounds: Bounds,
+        scale: Scale
+    ) {
+        var entryPositionY = bounds.minY
+
+        for y in grid.indices.reversed() {
+            // Skip title row.
+            if y == 0 && title != nil {
+                continue
+            }
+
+            // Only increment Y position within the graph area.
+            if y <= layout.graphEndY {
+                entryPositionY += scale.y
+            }
+
+            var entryPositionX = bounds.minX
+
+            for x in grid[y].indices {
+                // Skip areas outside the graph.
+                if x < layout.graphStartX || y > layout.graphEndY {
+                    continue
+                }
+
+                entryPositionX += scale.x
+
+                // Check if any entry falls within this cell.
+                if let entry = entries.first(where: { $0.x <= entryPositionX && $0.y <= entryPositionY }) {
+                    grid[y][x] = "*"
+
+                    _drawYAxisLabel(grid: &grid, layout: layout, row: y, value: entry.y)
+                    _drawXAxisLabel(grid: &grid, layout: layout, column: x, value: entry.x)
+
+                    // Remove drawn entry to avoid duplicates.
+                    entries.removeAll { $0.x <= entryPositionX && $0.y <= entryPositionY }
+                }
+            }
+        }
+    }
+
+    private func _drawYAxisLabel(grid: inout [[Character]], layout: Layout, row: Int, value: Double) {
+        guard showsYAxisValues else { return }
+        // Only draw if this row doesn't already have a label.
+        guard grid[row][layout.yAxisLabelStartX] == " " else { return }
+
+        let label = _formatValue(value)
+        for (i, char) in label.enumerated() {
+            grid[row][layout.yAxisLabelStartX + i] = char
+        }
+    }
+
+    private func _drawXAxisLabel(grid: inout [[Character]], layout: Layout, column: Int, value: Double) {
+        guard showsXAxisValues else { return }
+
+        let label = _formatValue(value)
+        let labelRow = layout.xAxisLabelY
+
+        // Check if there's room and no overlap.
+        guard column + label.count < grid[labelRow].count else { return }
+        guard grid[labelRow][column - 1] == " " || grid[labelRow][column - 1] == "│" else { return }
+        guard grid[labelRow][column + label.count] == " " else { return }
+
+        // Check for overlap before drawing.
+        let wouldOverlap = (0..<label.count).contains { grid[labelRow][column + $0] != " " }
+        guard !wouldOverlap else { return }
+
+        for (i, char) in label.enumerated() {
+            grid[labelRow][column + i] = char
+        }
+    }
+
+    // MARK: - Drawing: Connecting Lines
+
+    private func _drawConnectingLines(grid: inout [[Character]], layout: Layout) {
+        // Find all data point positions.
+        var points: [(x: Int, y: Int)] = []
+        for y in grid.indices {
+            for x in grid[y].indices {
+                if grid[y][x] == "*" {
+                    points.append((x: x, y: y))
+                }
+            }
+        }
+
+        // Sort left to right.
+        points.sort { $0.x < $1.x }
+
+        // Draw lines between consecutive points.
+        for i in 0..<(points.count - 1) {
+            let from = points[i]
+            let to = points[i + 1]
+            _drawLineBetween(from: from, to: to, grid: &grid, layout: layout)
+        }
+    }
+
+    private func _drawLineBetween(
+        from: (x: Int, y: Int),
+        to: (x: Int, y: Int),
+        grid: inout [[Character]],
+        layout: Layout
+    ) {
+        let dx = to.x - from.x
+        let dy = to.y - from.y
+
+        if dx <= 1 {
+            // Vertical or nearly vertical line.
+            _drawVerticalLine(from: from, to: to, grid: &grid, layout: layout)
+        } else if dy == 0 {
+            // Horizontal line.
+            _drawHorizontalLine(from: from, to: to, grid: &grid, layout: layout)
+        } else {
+            // Diagonal line.
+            _drawDiagonalLine(from: from, to: to, grid: &grid, layout: layout)
+        }
+    }
+
+    private func _drawVerticalLine(
+        from: (x: Int, y: Int),
+        to: (x: Int, y: Int),
+        grid: inout [[Character]],
+        layout: Layout
+    ) {
+        let minY = min(from.y, to.y)
+        let maxY = max(from.y, to.y)
+
+        for y in (minY + 1)..<maxY {
+            if _isValidGraphPosition(x: from.x, y: y, grid: grid, layout: layout) {
+                grid[y][from.x] = "|"
+            }
+        }
+    }
+
+    private func _drawHorizontalLine(
+        from: (x: Int, y: Int),
+        to: (x: Int, y: Int),
+        grid: inout [[Character]],
+        layout: Layout
+    ) {
+        for x in (from.x + 1)..<to.x {
+            if _isValidGraphPosition(x: x, y: from.y, grid: grid, layout: layout) {
+                grid[from.y][x] = "─"
+            }
+        }
+    }
+
+    private func _drawDiagonalLine(
+        from: (x: Int, y: Int),
+        to: (x: Int, y: Int),
+        grid: inout [[Character]],
+        layout: Layout
+    ) {
+        let dx = to.x - from.x
+        let dy = to.y - from.y
+        let steps = max(abs(dx), abs(dy))
+        let lineChar: Character = dy < 0 ? "/" : "╲"
+
+        for step in 1..<steps {
+            let t = Double(step) / Double(steps)
+            let x = from.x + Int(Double(dx) * t)
+            let y = from.y + Int(Double(dy) * t)
+
+            if _isValidGraphPosition(x: x, y: y, grid: grid, layout: layout) && grid[y][x] == " " {
+                grid[y][x] = lineChar
+            }
+        }
+    }
+
+    private func _isValidGraphPosition(x: Int, y: Int, grid: [[Character]], layout: Layout) -> Bool {
+        y >= 0 && y <= layout.graphEndY && x >= layout.graphStartX && x < grid[y].count
+    }
+
+    // MARK: - Drawing: Title
+
+    private func _drawTitle(_ title: String, grid: inout [[Character]]) {
+        let maxWidth = grid[0].count
+        var titleChars = Array(title.truncateString(limit: maxWidth))
+
+        // Center the title.
+        if titleChars.count < maxWidth {
+            let padding = (maxWidth - titleChars.count) / 2
+            titleChars.insert(contentsOf: Array(repeating: " ", count: padding), at: 0)
+            titleChars.append(contentsOf: Array(repeating: " ", count: padding))
+        }
+
+        grid[0] = titleChars
+    }
+
+    // MARK: - Resolution Filtering
+
+    private func _filterEntriesByResolution(_ entries: [Entry], resolution: Double) -> [Entry] {
         guard entries.count > 2, resolution < 1.0 else {
             return entries
         }
 
         let resolution = max(0, min(1, resolution))
 
-        // Identify peaks and valleys (local maxima and minima)
-        var isPeakOrValley = [Bool](repeating: false, count: entries.count)
-
-        // First and last are always kept
-        isPeakOrValley[0] = true
-        isPeakOrValley[entries.count - 1] = true
+        // Identify peaks and valleys.
+        var isSignificant = [Bool](repeating: false, count: entries.count)
+        isSignificant[0] = true
+        isSignificant[entries.count - 1] = true
 
         for i in 1..<(entries.count - 1) {
             let prev = entries[i - 1].y
             let curr = entries[i].y
             let next = entries[i + 1].y
 
-            // Local maximum (peak)
-            if curr >= prev && curr >= next && (curr > prev || curr > next) {
-                isPeakOrValley[i] = true
-            }
-            // Local minimum (valley)
-            else if curr <= prev && curr <= next && (curr < prev || curr < next) {
-                isPeakOrValley[i] = true
-            }
+            let isPeak = curr >= prev && curr >= next && (curr > prev || curr > next)
+            let isValley = curr <= prev && curr <= next && (curr < prev || curr < next)
+
+            isSignificant[i] = isPeak || isValley
         }
 
-        // Collect middle entries (non-peak, non-valley)
-        var middleIndices: [Int] = []
-        for i in 0..<entries.count {
-            if !isPeakOrValley[i] {
-                middleIndices.append(i)
-            }
-        }
+        // Collect non-significant (middle) indices.
+        let middleIndices = entries.indices.filter { !isSignificant[$0] }
 
-        // Calculate how many middle entries to keep
-        let middleToKeep = Int(Double(middleIndices.count) * resolution)
+        // Calculate how many middle entries to keep.
+        let keepCount = Int(Double(middleIndices.count) * resolution)
+        var keepSet = Set<Int>()
 
-        // Select evenly distributed middle entries to keep
-        var middleToKeepSet = Set<Int>()
-        if middleToKeep > 0 && !middleIndices.isEmpty {
-            let step = Double(middleIndices.count) / Double(middleToKeep)
-            for i in 0..<middleToKeep {
+        if keepCount > 0 && !middleIndices.isEmpty {
+            let step = Double(middleIndices.count) / Double(keepCount)
+            for i in 0..<keepCount {
                 let index = Int(Double(i) * step)
                 if index < middleIndices.count {
-                    middleToKeepSet.insert(middleIndices[index])
+                    keepSet.insert(middleIndices[index])
                 }
             }
         }
 
-        // Build the final filtered array
-        var result: [(x: Double, y: Double)] = []
-        for i in 0..<entries.count {
-            if isPeakOrValley[i] || middleToKeepSet.contains(i) {
-                result.append(entries[i])
-            }
+        // Build filtered result.
+        return entries.enumerated().compactMap { index, entry in
+            (isSignificant[index] || keepSet.contains(index)) ? entry : nil
         }
-
-        return result
     }
 
-    public init(entries: [(x: Double, y: Double)], title: String? = nil, xAxisTitle: String? = nil, yAxisTitle: String? = nil, width: Int = 50, height: Int = 10, resolution: Double = 1.0) {
-        self.content = ""
-        self.title = title
-        self.xAxisTitle = xAxisTitle
-        self.yAxisTitle = yAxisTitle
-        self._maxXAxisWidth = Double(width)
-        self._maxYAxisHeight = Double(height)
-        self._minXWidth = Double(width)
-        self._minYHeight = Double(height)
+    // MARK: - Helpers
 
-        // Apply resolution filtering to reduce middle entries
-        var entries = Self.filterByResolution(entries: entries, resolution: resolution)
-
-        // Find min max x and y.
-        var maxY = entries.first?.y ?? 0
-        var maxX = entries.first?.x ?? 0
-        var minY = entries.first?.y ?? 0
-        var minX = entries.first?.x ?? 0
-
-        for entry in entries {
-            if entry.y > maxY {
-                maxY = entry.y
-            }
-            if entry.y < minY {
-                minY = entry.y
-            }
-            if entry.x > maxX {
-                maxX = entry.x
-            }
-            if entry.x < minX {
-                minX = entry.x
-            }
-        }
-
-        // Determine how many data points are captured in each row.
-        var scaleY: Double = 1
-        if maxY - minY > _maxYAxisHeight {
-            scaleY = (maxY - minY) / Double(_maxYAxisHeight)
-        } else {
-            if maxY - minY < _minYHeight {
-                scaleY = (maxY - minY) / Double(_minYHeight)
-            } else {
-                _maxYAxisHeight = maxY - minY
-            }
-        }
-
-        // Determine how many data points are captured in each column.
-        var scaleX: Double = 1
-        if maxX - minX > _maxXAxisWidth {
-            scaleX =  (maxX - minX) / Double(_maxXAxisWidth)
-        } else {
-            if maxX - minX < _minXWidth {
-                scaleX = (maxX - minX) / Double(_minXWidth)
-            } else {
-                _maxXAxisWidth = maxX - minX
-            }
-        }
-
-        // Calculate extra height width of the graph, all context excluding the graph data points.
-        let largestYAxisValueLength = entries.reduce(0) { max($0, String(format: "%0.f", $1.y).count) }
-
-        let extraHeight = (title != nil ? 1 : 0) + (showsAxisLines ? 1 : 0) + (showsXAxisValues ? 1 : 0) + (xAxisTitle != nil ? 1 : 0) + 1
-
-        let extraWidth = (yAxisTitle != nil ? 1 : 0) + (showsYAxisValues ? largestYAxisValueLength : 0) + (showsAxisLines ? 1 : 0)
-
-        var content: [[Character]] = .init(repeating: .init(repeating: " ", count: Int(_maxXAxisWidth + Double(extraWidth))), count: Int(_maxYAxisHeight + Double(extraHeight)))
-
-        // Where the graph data points start in the 2d array.
-        let xAxisStartIndex = Int(extraWidth)
-        let yAxisStartIndex = content.count - Int(extraHeight) + 1
-
-        // The x and y data point entry values.
-        let initialPositionX = minX
-        var entryPositionX = initialPositionX - scaleX
-        var entryPositionY = minY
-
-        // The y index where we draw '_'
-        let xBoundaryLineYIndex = yAxisStartIndex + 1
-        // The y index where we draw the x value numbers. Just under the boundary.
-        let xValueLabelYIndex = xBoundaryLineYIndex + 1
-        // The y index where we draw the description of the axis. Just under the data point value labels.
-        let xAxisLabelYIndex = xValueLabelYIndex + 1
-
-        // The x index where we draw '|'
-        let yBoundaryLineXIndex = xAxisStartIndex - 1
-
-        // The x index where we start to draw the y value members. Just before the boundary.
-        let yValueLabelXIndex = yBoundaryLineXIndex - largestYAxisValueLength
-
-        // Pre-compute screen positions for all entries to enable line drawing
-        var screenPositions: [(screenX: Int, screenY: Int, entry: (x: Double, y: Double))] = []
-        for entry in entries {
-            // Convert data coordinates to screen coordinates
-            let screenX = xAxisStartIndex + Int((entry.x - minX) / scaleX)
-            // Y is inverted: higher values = lower row index (closer to top)
-            let screenY = yAxisStartIndex - Int((entry.y - minY) / scaleY)
-            screenPositions.append((screenX: screenX, screenY: screenY, entry: entry))
-        }
-
-        // Sort by x position to ensure we connect points left to right
-        screenPositions.sort { $0.screenX < $1.screenX }
-
-        // Draw connecting lines between consecutive points
-        for i in 0..<(screenPositions.count - 1) {
-            let from = screenPositions[i]
-            let to = screenPositions[i + 1]
-
-            let dx = to.screenX - from.screenX
-            let dy = to.screenY - from.screenY // Note: negative dy means going up visually
-
-            if dx <= 1 {
-                // Vertical line
-                let minScreenY = min(from.screenY, to.screenY)
-                let maxScreenY = max(from.screenY, to.screenY)
-                for y in (minScreenY + 1)..<maxScreenY {
-                    if y >= 0 && y <= yAxisStartIndex && from.screenX < content[y].count {
-                        content[y][from.screenX] = "|"
-                    }
-                }
-            } else if dy == 0 {
-                // Horizontal line
-                for x in (from.screenX + 1)..<to.screenX {
-                    if from.screenY >= 0 && from.screenY <= yAxisStartIndex && x < content[from.screenY].count {
-                        content[from.screenY][x] = "─"
-                    }
-                }
-            } else {
-                // Diagonal line - use Bresenham-style stepping
-                let steps = max(abs(dx), abs(dy))
-                for step in 1..<steps {
-                    let t = Double(step) / Double(steps)
-                    let x = from.screenX + Int(Double(dx) * t)
-                    let y = from.screenY + Int(Double(dy) * t)
-
-                    if y >= 0 && y <= yAxisStartIndex && x >= xAxisStartIndex && x < content[y].count {
-                        if content[y][x] == " " {
-                            if dy < 0 {
-                                // Going up (y decreasing = visually up)
-                                content[y][x] = "/"
-                            } else {
-                                // Going down (y increasing = visually down)
-                                content[y][x] = "╲"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for y in content.indices.reversed() {
-            // Keep y 0 empty to leave space for the title.
-            if y == 0, title != nil {
-                continue
-            }
-
-            entryPositionX = initialPositionX
-
-            // While we are draw the label, boundary etc don't increase the entry position.
-            if y <= yAxisStartIndex {
-                entryPositionY += scaleY
-            }
-
-            for x in content[y].indices {
-                // Draw the y axis boundary.
-                if x < xAxisStartIndex {
-                    if x == yBoundaryLineXIndex && showsAxisLines {
-                        content[y][x] = "│"
-                    }
-
-                    continue
-                }
-
-                // Draw the x axis boundary.
-                if y > yAxisStartIndex {
-                    if y == xBoundaryLineYIndex && showsAxisLines {
-                        content[y][x] = "―"
-                    }
-
-                    continue
-                }
-
-                entryPositionX += scaleX
-
-                // Check if we passed any entries, if show draw a datapoint.
-                if let value = entries.first(where: { $0.x <= entryPositionX && $0.y <= entryPositionY }) {
-                    content[y][x] = "*"
-
-                    // Draw the y axis value, only if a previous datapoint didn't already write on this row.
-                    if showsYAxisValues, content[y][yBoundaryLineXIndex - largestYAxisValueLength] == " " {
-                        for (i, valueChar) in Array(String(format: "%0.f", value.y)).enumerated() {
-                            content[y][yBoundaryLineXIndex - largestYAxisValueLength + i] = valueChar
-                        }
-                    }
-
-                    // Draw the x axis value, but if we going to overlap a previous datapoint skip this value.
-                    if showsXAxisValues {
-                        let valueString = String(format: "%0.f", value.x)
-
-                        // Enough space to write out full value?
-                        if x + valueString.count < content[xValueLabelYIndex].count,
-                           // Left side is boundary or empty?
-                           (content[xValueLabelYIndex][x - 1] == " " || content[xValueLabelYIndex][x - 1] == "│"),
-                           // Right side is empty?
-                           content[xValueLabelYIndex][x + valueString.count] == " " {
-
-                            // Attempt to draw, if checking for overlap.
-                            var contentCopy = content
-                            var didOverlap = false
-                            for (i, valueChar) in Array(String(format: "%0.f", value.x)).enumerated() {
-                                if contentCopy[xValueLabelYIndex][x + i] != " " {
-                                    didOverlap = true
-                                }
-                                contentCopy[xValueLabelYIndex][x + i] = valueChar
-                            }
-
-                            if !didOverlap {
-                                content = contentCopy
-                            }
-                        }
-                    }
-
-                    // Remove the entry so we don't draw it again.
-                    entries.removeAll { $0.x <= entryPositionX && $0.y <= entryPositionY }
-                }
-            }
-        }
-
-        // Fill in the title at the top of the graph.
-        if let title {
-            var titleArray = Array(title.truncateString(limit: content[0].count))
-            if titleArray.count < content[0].count {
-                let spaceToAddOnEachSide = (content[0].count - titleArray.count) / 2
-                titleArray.insert(contentsOf: [Character].init(repeating: " ", count: spaceToAddOnEachSide), at: 0)
-                titleArray.append(contentsOf: [Character].init(repeating: " ", count: spaceToAddOnEachSide))
-            }
-
-            content[0] = titleArray
-        }
-
-
-        self.content = content.map {
-            String($0)
-        }.joined(separator: "\n")
-    }
-
-    private func drawConnectingLines() {
-        
+    private func _formatValue(_ value: Double) -> String {
+        String(format: "%0.f", value)
     }
 }

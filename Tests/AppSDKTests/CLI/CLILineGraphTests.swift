@@ -27,8 +27,8 @@ struct CLILineGraphTests {
         3│       *///         
         2│   *///             
         1│*//                 
-         │――――――――――――――――――――
-         │0  1   2   3   4    
+          ――――――――――――――――――――
+          0  1   2   3   4    
         """
 
         #expect(graph.content == expected)
@@ -49,8 +49,8 @@ struct CLILineGraphTests {
          │          /////     
          │     /////          
         0│*////               
-         │――――――――――――――――――――
-         │0                   
+          ――――――――――――――――――――
+          0                   
         """
 
         #expect(graph.content == expected)
@@ -70,8 +70,8 @@ struct CLILineGraphTests {
              │     ╲╲╲       //   
              │        ╲╲   //     
             0│          *//       
-             │――――――――――――――――――――
-             │0         2         
+              ――――――――――――――――――――
+              0         2         
             """
 
         #expect(graph.content == expected)
@@ -91,8 +91,8 @@ struct CLILineGraphTests {
             │                    
             │                    
            3│*─────────*────────*
-            │――――――――――――――――――――
-            │0         2         
+             ――――――――――――――――――――
+             0         2         
            """
 
         #expect(graph.content == expected)
@@ -112,8 +112,8 @@ struct CLILineGraphTests {
           │                    
           │                    
         10│*                   
-          │――――――――――――――――――――
-          │5                   
+           ――――――――――――――――――――
+           5                   
         """
 
         #expect(graph.content == expected)
@@ -144,8 +144,8 @@ struct CLILineGraphTests {
          │      //           ╲╲  //     
         2│    */               */       
         0│*///                          
-         │――――――――――――――――――――――――――――――
-         │0   1   2   3    4   5   6    
+          ――――――――――――――――――――――――――――――
+          0   1   2   3    4   5   6    
         """
 
         let expectedHalfReduced = """
@@ -155,8 +155,8 @@ struct CLILineGraphTests {
          │      //           ╲╲  //     
         2│    */               */       
         0│*///                          
-         │――――――――――――――――――――――――――――――
-         │0   1       3    4   5        
+          ――――――――――――――――――――――――――――――
+          0   1       3    4   5        
         """
 
         let expectedFullReduced = """
@@ -166,8 +166,8 @@ struct CLILineGraphTests {
          │     ///           ╲╲  //     
         2│   //                */       
         0│*//                           
-         │――――――――――――――――――――――――――――――
-         │0           3        5        
+          ――――――――――――――――――――――――――――――
+          0           3        5        
         """
 
         #expect(graphFull.content == expectedFull)
