@@ -99,6 +99,30 @@ struct CLILineGraphTests {
         #expect(graph.content == expected)
     }
 
+    @Test("Graph test for scale issue")
+    func testGraphScaleIssue() {
+        let entries: [(x: Double, y: Double)] = [
+            (1.0, 11.07), (2.0, 3.010), (3.0, 5.47)
+        ]
+
+        let graph = CLILineGraph(entries: entries, width: 30, height: 10)
+
+        let expected = """
+        11│*╲                            
+          │  ╲╲                          
+          │    ╲                         
+          │     ╲╲                       
+          │       ╲                      
+          │        ╲╲                    
+        5 │          ╲                  *
+          │           ╲╲           ///// 
+          │             ╲     /////      
+        3 │              *////           
+           ――――――――――――――――――――――――――――――
+           1             2              3
+        """
+    }
+
     @Test("Graph with single point")
     func singlePointGraph() {
         let entries: [(x: Double, y: Double)] = [

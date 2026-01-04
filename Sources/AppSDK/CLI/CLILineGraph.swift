@@ -199,6 +199,10 @@ public struct CLILineGraph {
 
         let accuracyAllowance = 0.0001
 
+        let isEntryHit = { (entry: Entry, x: Double, y: Double) -> Bool in
+            return (entry.x - accuracyAllowance <= x) && (entry.y - accuracyAllowance <= y)
+        }
+
         for y in grid.indices.reversed() {
             // Skip title row.
             if y == 0 && title != nil {
@@ -221,14 +225,14 @@ public struct CLILineGraph {
                 entryPositionX += scale.x
 
                 // Check if any entry falls within this cell.
-                if let entry = entries.first(where: { ($0.x - accuracyAllowance) <= entryPositionX && ($0.y - accuracyAllowance) <= entryPositionY }) {
+                if let entry = entries.first(where: { isEntryHit($0, entryPositionX, entryPositionY) }) {
                     grid[y][x] = "*"
 
                     _drawYAxisLabel(grid: &grid, layout: layout, row: y, value: entry.y)
                     _drawXAxisLabel(grid: &grid, layout: layout, column: x, value: entry.x)
 
                     // Remove drawn entry to avoid duplicates.
-                    entries.removeAll { $0.x <= entryPositionX && $0.y <= entryPositionY }
+                    entries.removeAll { isEntryHit($0, entryPositionX, entryPositionY) }
                 }
             }
         }
@@ -326,6 +330,10 @@ public struct CLILineGraph {
     ) {
         let minY = min(from.y, to.y)
         let maxY = max(from.y, to.y)
+
+        guard maxY > minY else {
+            return
+        }
 
         for y in (minY + 1)..<maxY {
             if _isValidGraphPosition(x: from.x, y: y, grid: grid, layout: layout) {
