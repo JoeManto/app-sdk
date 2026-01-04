@@ -197,6 +197,8 @@ public struct CLILineGraph {
     ) {
         var entryPositionY = bounds.minY
 
+        let accuracyAllowance = 0.0001
+
         for y in grid.indices.reversed() {
             // Skip title row.
             if y == 0 && title != nil {
@@ -219,7 +221,7 @@ public struct CLILineGraph {
                 entryPositionX += scale.x
 
                 // Check if any entry falls within this cell.
-                if let entry = entries.first(where: { $0.x <= entryPositionX && $0.y <= entryPositionY }) {
+                if let entry = entries.first(where: { ($0.x - accuracyAllowance) <= entryPositionX && ($0.y - accuracyAllowance) <= entryPositionY }) {
                     grid[y][x] = "*"
 
                     _drawYAxisLabel(grid: &grid, layout: layout, row: y, value: entry.y)
@@ -250,9 +252,15 @@ public struct CLILineGraph {
         let labelRow = layout.xAxisLabelY
 
         // Check if there's room and no overlap.
-        guard column + label.count < grid[labelRow].count else { return }
-        guard grid[labelRow][column - 1] == " " || grid[labelRow][column - 1] == "│" else { return }
-        guard grid[labelRow][column + label.count] == " " else { return }
+        guard (column + label.count - 1) < grid[labelRow].count else {
+            return
+        }
+        guard grid[labelRow][column - 1] == " " || grid[labelRow][column - 1] == "│" else {
+            return
+        }
+        guard grid[labelRow].count == column + label.count || grid[labelRow][column + label.count] == " " else {
+            return
+        }
 
         // Check for overlap before drawing.
         let wouldOverlap = (0..<label.count).contains { grid[labelRow][column + $0] != " " }
@@ -280,10 +288,12 @@ public struct CLILineGraph {
         points.sort { $0.x < $1.x }
 
         // Draw lines between consecutive points.
-        for i in 0..<(points.count - 1) {
-            let from = points[i]
-            let to = points[i + 1]
-            _drawLineBetween(from: from, to: to, grid: &grid, layout: layout)
+        if points.count - 1 > 0 {
+            for i in 0..<(points.count - 1) {
+                let from = points[i]
+                let to = points[i + 1]
+                _drawLineBetween(from: from, to: to, grid: &grid, layout: layout)
+            }
         }
     }
 

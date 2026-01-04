@@ -37,20 +37,21 @@ struct CLILineGraphTests {
     @Test("Graph with title centered")
     func graphWithTitle() {
         let entries: [(x: Double, y: Double)] = [
-            (0, 0), (5, 5)
+            (3, 3), (4, 4)
         ]
 
-        let graph = CLILineGraph(entries: entries, title: "Test", width: 20, height: 5)
+        let graph = CLILineGraph(entries: entries, title: "Test", width: 20, height: 6, resolution: 1.0)
 
         let expected = """
                  Test         
-        5│                   *
-         │               //// 
-         │          /////     
-         │     /////          
-        0│*////               
+        4│                   *
+         │                /// 
+         │            ////    
+         │        ////        
+         │    ////            
+        3│*///                
           ――――――――――――――――――――
-          0                   
+          3                  4
         """
 
         #expect(graph.content == expected)
