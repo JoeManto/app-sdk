@@ -19,10 +19,10 @@ public struct CLIDataFilterOption {
     }
 
     public let key: String
-    public let value: Float
+    public let value: Double
     public let comparisonOperator: ComparisonOperator
 
-    public init(key: String, value: Float, comparisonOperator: ComparisonOperator) {
+    public init(key: String, value: Double, comparisonOperator: ComparisonOperator) {
         self.key = key
         self.value = value
         self.comparisonOperator = comparisonOperator
@@ -52,14 +52,14 @@ public struct CLIDataFilterOption {
             throw AppError.invalidInput("Expected two components in data filter: \(trimmedFilterString)")
         }
 
-        guard let floatValue = Float(String(value)) else {
+        guard let floatValue = Double(String(value)) else {
             throw AppError.invalidInput("Value must be a number in filter: \(trimmedFilterString)")
         }
 
         self.init(key: String(key), value: floatValue, comparisonOperator: comparisonOperator)
     }
 
-    public func includes(_ value: Float) -> Bool {
+    public func includes(_ value: Double) -> Bool {
         switch comparisonOperator {
         case .equal:
             return value == self.value
