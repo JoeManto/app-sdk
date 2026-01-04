@@ -42,7 +42,7 @@ public struct CLIDateRangeArgumentParser {
                 return Date(timeIntervalSince1970: 0)...endDate
             } else if rangeString.hasSuffix(Self.rangeSplitSeparator) {
                 let startDate = try _parseDate(dateString: dateString, startAtBeginning: true)
-                return startDate...Date.now
+                return startDate...Date.currentDate
             } else {
                 guard let option = ConvenienceDateOptions(rawValue: dateString) else {
                     throw AppError.invalidInput("unexpected date option: \(dateString)")
@@ -100,9 +100,9 @@ public struct CLIDateRangeArgumentParser {
         switch option {
         case .today:
             // today... (start of today) ...today (end of today)
-            return startAtBeginning ? calendar.startOfDay(for: .now) : .now
+            return startAtBeginning ? calendar.startOfDay(for: .currentDate) : .currentDate
         case .yesterday:
-            guard let yesterday = calendar.date(byAdding: .day, value: -1, to: .now) else {
+            guard let yesterday = calendar.date(byAdding: .day, value: -1, to: .currentDate) else {
                 return nil
             }
 
@@ -110,34 +110,34 @@ public struct CLIDateRangeArgumentParser {
             return startAtBeginning ? calendar.startOfDay(for: yesterday) : yesterday.endOfDay(using: calendar)
         case .thisWeek:
             // thisWeek... (start of this week) ...thisWeek (end of this week)
-            let startOfThisWeek = Date.now.thisWeekSunday(startOfDay: true)
-            let endOfThisWeek = Date.now
+            let startOfThisWeek = Date.currentDate.thisWeekSunday(startOfDay: true)
+            let endOfThisWeek = Date.currentDate
             return startAtBeginning ? startOfThisWeek : endOfThisWeek
         case .lastWeek:
             // lastWeek... (start of last week) ...lastWeek (end of last week)
-            let startOfLastWeek = Date.now.lastWeekSunday(startOfDay: true)
-            let endOfLastWeek = Date.now.lastWeekSunday(startOfDay: false)
+            let startOfLastWeek = Date.currentDate.lastWeekSunday(startOfDay: true)
+            let endOfLastWeek = Date.currentDate.lastWeekSunday(startOfDay: false)
             return startAtBeginning ? startOfLastWeek : endOfLastWeek
         case .thisMonth:
             // thisMonth... (start of this month) ...thisMonth (end of this month)
-            let startOfMonth = Date.now.startOfThisMonth(startOfDay: true)
-            let endOfThisMonth = Date.now.endOfThisMonth(startOfDay: false)
+            let startOfMonth = Date.currentDate.startOfThisMonth(startOfDay: true)
+            let endOfThisMonth = Date.currentDate.endOfThisMonth(startOfDay: false)
             return startAtBeginning ? startOfMonth : endOfThisMonth
         case .lastMonth:
             // lastMonth... (start of last month) ...lastMonth (end of last month)
-            guard let endOfLastMonth =  Date.now.startOfThisMonth(startOfDay: true)?.addingTimeInterval(-1) else {
+            guard let endOfLastMonth =  Date.currentDate.startOfThisMonth(startOfDay: true)?.addingTimeInterval(-1) else {
                 return nil
             }
             let startOfLastMonth = endOfLastMonth.startOfThisMonth(startOfDay: true)
             return startAtBeginning ? startOfLastMonth : endOfLastMonth
         case .thisYear:
             // thisYear... (start of this year) ...thisYear (end of this year)
-            let endOfThisYear = Date.now.endOfThisYear(startOfDay: false)
-            let startOfThisYear = Date.now.startOfThisYear(startOfDay: true)
+            let endOfThisYear = Date.currentDate.endOfThisYear(startOfDay: false)
+            let startOfThisYear = Date.currentDate.startOfThisYear(startOfDay: true)
             return startAtBeginning ? startOfThisYear : endOfThisYear
         case .lastYear:
             // lastYear... (start of last year) ...lastYear (end of last year)
-            guard let endOfLastYear = Date.now.endOfThisYear(startOfDay: false)?.addingTimeInterval(-1) else {
+            guard let endOfLastYear = Date.currentDate.endOfThisYear(startOfDay: false)?.addingTimeInterval(-1) else {
                 return nil
             }
             let startOfLastYear = endOfLastYear.startOfThisYear(startOfDay: true)

@@ -7,8 +7,26 @@
 
 import Foundation
 
-extension Date {
+public var _currentDate = Date()
 
+extension Date {
+    public enum TimeUnits: String, CustomStringConvertible {
+        case second
+        case minute
+        case hour
+        case day
+        case week
+        case month
+        case year
+
+        public var description: String {
+            return self.rawValue.capitalized
+        }
+    }
+
+    static var currentDate: Date {
+        _currentDate
+    }
 
     /// Represents the days of the week, with raw values matching the `Calendar.Component.weekday`.
     ///
@@ -48,7 +66,7 @@ extension Date {
     /// - Returns: A `Date` representing the desired moment of yesterday.
     public static func yesterday(startOfDay: Bool) -> Date {
         let calendar = Calendar.current
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: .now)!
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: .currentDate)!
 
         if startOfDay {
             return calendar.startOfDay(for: yesterday)
@@ -161,7 +179,7 @@ extension Date {
         if startOfDay {
             return calendar.startOfDay(for: lastWeekSunday)
         } else {
-            return lastWeekSunday.endOfDay(using: calendar) ?? lastWeekSunday
+            return lastWeekSunday.endOfDay(using: calendar)
         }
     }
 
